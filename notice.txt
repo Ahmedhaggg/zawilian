@@ -1,0 +1,8 @@
+for run test files
+sudo docker-compose exec server node_modules/.bin/jest /test/repositories/course.repository.test.js --detectOpenHandles
+
+for create migration file
+npx sequelize migration:generate --name modify_column_term_course_table_3
+
+for migrate files in database
+sudo docker-compose exec server npm run db:migrate

@@ -1,0 +1,113 @@
+body {
+  margin: 0;
+  font-family: 'Cairo', sans-serif;
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  font-family: 'Cairo', sans-serif;
+  font-family: 'Roboto', sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+:root {
+  --mainColor: #d32f2f;
+  --lightMainColor: #ef5350;
+  --secondColor: #0c54bc;
+  --whiteColor: #ffebee;
+  --blackColor: #1f1d1d;
+}
+
+.bg-main-color {
+  background-color: var(--mainColor);
+}
+
+.bg-second-color {
+  background-color: var(--secondColor);
+}
+
+.bg-white-color {
+  background-color: var(--whiteColor);
+}
+
+.bg-black-color {
+  background-color: var(--blackColor);
+}
+
+.text-main-color {
+  color: var(--mainColor);
+}
+
+.text-second-color {
+  color: var(--secondColor);
+}
+
+.text-white-color {
+  color: var(--whiteColor);
+}
+
+.text-black-color {
+  color: var(--blackColor);
+}
+
+/* start components */
+
+/* dashboard item */
+.dashboard-item {
+  height: 200px;
+  transition: 0.4s;
+}
+
+.dashboard-item:hover {
+  cursor: pointer;
+  box-shadow: 1px 1px 6px -1px #888888;
+}
+
+/* Box */
+.box {
+  height: 200px;
+}
+
+/* video */
+.video {
+  height: 300px;
+  width: 100%;
+}
+
+/* end components */
+
+/* dashboard */
+.dashboard-section {
+  padding-top: 70px;
+  padding-bottom: 70px;
+  text-align: center;
+}
+
+/* start sidebar */
+.nav-pills .nav-link {
+  border-radius: 0%;
+  font-size: 13px;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #f7e7e6;
+
+}
+
+.content {
+  width: calc(100% - 300px)
+}
+
+/* .dashboard {
+  
+} */
+
+.collapse .navbar-collapse {
+  transition: all 0.5s;
+}

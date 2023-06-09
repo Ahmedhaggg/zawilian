@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "christian-kohler.path-intellisense",
+        "tabnine.tabnine-vscode",
+        "kvcvc.sequelize-snippets",
+        "leizongmin.node-module-intellisense",
+        "waderyan.nodejs-extension-pack"
+    ]
+}
