@@ -7,32 +7,30 @@ export const courseSelice = apiSlice.injectEndpoints({
         getAllCourses: builder.query({
             query: () => {
                 return {
-                    url: "courses",
+                    url: "v2/courses",
                     method: "GET",
                     headers: {
                         'authorization': getToken()
                     }
                 }
-            },
-            providesTags: ["Course"]
+            }
         }),
         getCourse: builder.query({
             query: (id) => {
                 return {
-                    url: `courses/${id}`,
+                    url: `v2/courses/${id}`,
                     method: "GET",
                     headers: {
                         'authorization': getToken()
                     }
                 }
-            },
-            providesTags: ["Course"]
+            }
         }),
         createCourse: builder.mutation({
             query: newCourseData => {
                 return ({
                     method: "POST",
-                    url: "courses",
+                    url: "v2/courses",
                     headers: {
                         'Content-Type': 'application/json',
                         'authorization': getToken()
@@ -40,13 +38,25 @@ export const courseSelice = apiSlice.injectEndpoints({
                     body: JSON.stringify(newCourseData)
                 })
             },
-            invalidatesTags: ["Course"]
+            async onQueryStarted(newCourseData, { dispatch, queryFulfilled }) {
+                try {
+                    let { data } = await queryFulfilled;
+                    if (!data.success)
+                        return;
+                    
+                    dispatch(
+                        apiSlice.util.updateQueryData('getAllCourses', undefined, (draft) => {
+                            draft.courses.push(data.newCourse)
+                        })
+                    )
+                } catch (_) {}
+            }
         }),
         updateCourse: builder.mutation({
             query: ({ courseId, newCourseData }) => {
                 return ({
-                    url: `courses/${courseId}`,
-                    method: "PUT",
+                    url: `v2/courses/${courseId}`,
+                    method: "PATCH",
                     headers: {
                         'Content-Type': 'application/json',
                         'authorization': getToken()
@@ -54,9 +64,46 @@ export const courseSelice = apiSlice.injectEndpoints({
                     body: JSON.stringify(newCourseData)
                 })
             },
-            invalidatesTags: ["Course"]
+            onQueryStarted: async ({ courseId, newCourseData }, { dispatch, queryFulfilled}) => {
+                try {
+                    let { data } = await queryFulfilled;
+                    if (!data.success)
+                        return;
+                    dispatch(
+                        apiSlice.util.updateQueryData('getCourse', courseId, (draft) => {
+                            Object.assign(draft, { ...draft, course: { ...newCourseData }})
+                        })
+                    )
+
+                    dispatch(
+                        apiSlice.util.updateQueryData('getAllCourses', undefined, (draft) => {
+                            const updatedCourseIndex = draft.courses.findIndex((course) => course.id == courseId);
+                            if (updatedCourseIndex !== -1) {
+                                let courses = [
+                                    ...draft.courses.slice(0, updatedCourseIndex),
+                                    {
+                                        ...draft.courses[updatedCourseIndex],
+                                        ...newCourseData
+                                    },
+                                    ...draft.courses.slice(updatedCourseIndex + 1),
+                                ];
+                                
+                                Object.assign(draft, {
+                                    ...draft,
+                                    courses
+                                })
+                            }
+                        })
+                    )
+                } catch (_){}
+            }
         })
     })
 });
 
-export const { useGetAllCoursesQuery, useGetCourseQuery, useCreateCourseMutation, useUpdateCourseMutation } = courseSelice;
+export const { 
+    useGetAllCoursesQuery, 
+    useGetCourseQuery, 
+    useCreateCourseMutation, 
+    useUpdateCourseMutation 
+} = courseSelice;

@@ -14,7 +14,6 @@ module.exports = {
                 return [
                     ...mainRules,
                     check("exam").notEmpty().withMessage(messages.genrale.required),
-                    check("exam.points").notEmpty().withMessage(messages.genrale.required),
                     check("exam.questions").not().isEmpty().withMessage(messages.genrale.required),
                     check("exam.questions[*]question").not().isEmpty().withMessage(messages.genrale.required),
                     check("exam.questions[*]answers").not().isEmpty().withMessage(messages.genrale.required),

@@ -38,7 +38,7 @@ exports.isAvailableLesson = async (req, res, next) => {
         let studentId = req.student.id;
         let { unitId, lessonId } = req.params;
 
-        let student = await studentService.getStudentCourseProgress({ _id: studentId });
+        let student = await studentService.getStudentCourseProgress({ id: studentId });
 
         if (student.courseProgress.currentLesson.lessonId === lessonId)
             return next();
@@ -77,7 +77,7 @@ exports.isAvailableCourseUnit = async (req, res, next) => {
     let studentId = req.student.id;
     let { unitId } = req.params;
 
-    let student = await studentService.getStudentCourseProgress({ _id: studentId });
+    let student = await studentService.getStudentCourseProgress({ id: studentId });
 
     if (student.courseProgress.currentUnit.unitId === unitId)
         return next();
@@ -88,7 +88,7 @@ exports.isAvailableUnitRevision = async (req, res, next) => {
     let studentId = req.student.id;
     let { unitId, revisionId } = req.params;
 
-    let student = await studentService.getStudentCourseProgress({ _id: studentId });
+    let student = await studentService.getStudentCourseProgress({ id: studentId });
 
     if (student.courseProgress.currentUnitRevision.revisionId ===  revisionId);
         return next();
@@ -106,7 +106,7 @@ exports.isAvailableCourseRevision = async (req, res, next) => {
     let studentId = req.student.id;
     let { unitId } = req.params;
 
-    let student = await studentService.getStudentCourseProgress({ _id: studentId });
+    let student = await studentService.getStudentCourseProgress({ id: studentId });
 
 
 }

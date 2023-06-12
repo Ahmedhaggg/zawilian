@@ -7,7 +7,7 @@ import { useGetAllCoursesQuery } from "../../store/courseSlice"
 export default function Courses() {
 
     const { data, isLoading, isSuccess } = useGetAllCoursesQuery();
-
+    
     return <>
         {
             isLoading ? <PageLoading /> : <>
@@ -18,17 +18,27 @@ export default function Courses() {
                             <thead className="bg-second-color text-light">
                                 <tr className="text-center">
                                     <th>name</th>
+                                    <th>term</th>
+                                    <th>grade</th>
                                     <th>update</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {data.courses.map(course => (
-                                    <tr className="text-center" key={course._id}>
+                                    <tr className="text-center" key={course.id}>
                                         <td data-title="course" className="fs-6">
-                                            <Link className="text-black-color text-decoration-none" to={"/courses/" + course._id}>{course.name}</Link>
+                                            <Link className="text-black-color text-decoration-none" to={"/courses/" + course.id}>{course.name}</Link>
+                                        </td>
+                                        <td data-title="course" className="fs-6">
+                                            {course.term}
                                         </td>
                                         <td data-title="update course">
-                                            <Link to={"/courses/" + course._id + "/edit"} className="text-decoration-none">
+                                            {
+                                                course.grade? course.grade.name :   <>...</>
+                                            }
+                                        </td>
+                                        <td data-title="update course">
+                                            <Link to={"/courses/" + course.id + "/edit"} className="text-decoration-none">
                                                 update
                                             </Link>
                                         </td>
@@ -36,6 +46,9 @@ export default function Courses() {
                                 ))}
                             </tbody>
                         </table>
+                        { 
+                            !data.courses.length && <p className="alert">no added courses</p>
+                        }
                         <Link className="btn btn-primary" to="/courses/create">go to add new course</Link>
                     </div>
                     : <Navigate to="505" />

@@ -7,32 +7,30 @@ export const gradeSlice = apiSlice.injectEndpoints({
         getAllGrades: builder.query({
             query: () => {
                 return {
-                    url: "grades",
+                    url: "v2/grades",
                     method: "GET",
                     headers: {
                         'authorization': getToken()
                     }
                 }
-            },
-            providesTags: ["Grade", "Course"]
+            }
         }),
         getGrade: builder.query({
             query: (id) => {
                 return {
-                    url: `grades/${id}`,
+                    url: `v2/grades/${id}`,
                     method: "GET",
                     headers: {
                         'authorization': getToken()
                     }
                 }
-            },
-            providesTags: ["Grade", "Course"]
+            }
         }),
         createGrade: builder.mutation({
             query: newGradeData => {
                 return ({
                     method: "POST",
-                    url: "grades",
+                    url: "v2/grades",
                     headers: {
                         'Content-Type': 'application/json',
                         'authorization': getToken()
@@ -40,73 +38,25 @@ export const gradeSlice = apiSlice.injectEndpoints({
                     body: JSON.stringify(newGradeData)
                 })
             },
-            invalidatesTags: ["Grade"]
-        }),
-        updateGrade: builder.mutation({
-            query: (data) => {
-                return ({
-                    method: "PUT",
-                    url: `grades/${data.gradeId}`,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'authorization': getToken()
-                    },
-                    body: JSON.stringify(data.newGradeData)
-                })
-            },
-            invalidatesTags: ["Grade"]
-        })
-    })
-})
-
-
-export const secondSlice = createApi({
-    reducerPath: "gradeSlice",
-    baseQuery: fetchBaseQuery({ baseUrl: process.env.REACT_APP_API_URL }),
-    tagTypes: ["Grade"],
-    endpoints: (builder) => ({
-        getAllGrades: builder.query({
-            query: () => {
-                return {
-                    url: "grades",
-                    method: "GET",
-                    headers: {
-                        'authorization': getToken()
-                    }
-                }
-            },
-            providesTags: ["Grade"]
-        }),
-        getGrade: builder.query({
-            query: (id) => {
-                return {
-                    url: `grades/${id}`,
-                    method: "GET",
-                    headers: {
-                        'authorization': getToken()
-                    }
-                }
-            },
-            providesTags: ["Grade"]
-        }),
-        createGrade: builder.mutation({
-            query: newGradeData => {
-                return ({
-                    method: "POST",
-                    url: "grades",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'authorization': getToken()
-                    },
-                    body: JSON.stringify(newGradeData)
-                })
+            async onQueryStarted(newGradeData, { dispatch, queryFulfilled }) {
+                try {
+                    let { data } = await queryFulfilled;
+                    if (!data.success)
+                        return;
+                    
+                    dispatch(
+                        apiSlice.util.updateQueryData('getAllGrades', undefined, (draft) => {
+                            draft.grades.push(data.newGrade)
+                        })
+                    )
+                } catch (_) {}
             }
         }),
         updateGrade: builder.mutation({
             query: (data) => {
                 return ({
-                    method: "PUT",
-                    url: `grades/${data.gradeId}`,
+                    method: "PATCH",
+                    url: `v2/grades/${data.gradeId}`,
                     headers: {
                         'Content-Type': 'application/json',
                         'authorization': getToken()
@@ -114,9 +64,47 @@ export const secondSlice = createApi({
                     body: JSON.stringify(data.newGradeData)
                 })
             },
-            invalidatesTags: ["Grade"]
+            onQueryStarted: async ({ gradeId, newGradeData }, { dispatch, queryFulfilled}) => {
+                try {
+                    let { data } = await queryFulfilled;
+                    if (!data.success)
+                        return;
+                    dispatch(
+                        apiSlice.util.updateQueryData('getGrade', gradeId, (draft) => {
+                            Object.assign(draft, { ...draft, grade: { ...newGradeData }})
+                        })
+                    )
+
+                    dispatch(
+                        apiSlice.util.updateQueryData('getAllGrades', undefined, (draft) => {
+                            const updatedGradeIndex = draft.grades.findIndex((grade) => grade.id == gradeId);
+                            if (updatedGradeIndex !== -1) {
+                                let grades = [
+                                    ...draft.grades.slice(0, updatedGradeIndex),
+                                    {
+                                        ...draft.grades[updatedGradeIndex],
+                                        ...newGradeData
+                                    },
+                                    ...draft.grades.slice(updatedGradeIndex + 1),
+                                ];
+                                
+                                Object.assign(draft, {
+                                    ...draft,
+                                    grades
+                                })
+                            }
+                        })
+                    )
+                } catch (_){}
+            }
         })
     })
-});
+})
 
-export const { useCreateGradeMutation, useGetGradeQuery, useGetAllGradesQuery, useUpdateGradeMutation } = gradeSlice;
+
+export const { 
+    useCreateGradeMutation, 
+    useGetGradeQuery, 
+    useGetAllGradesQuery, 
+    useUpdateGradeMutation 
+} = gradeSlice;

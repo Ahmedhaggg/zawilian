@@ -44,9 +44,9 @@ exports.show = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
     let { courseId } = req.params;
-    let { name } = req.body;
+    let { name, gradeId } = req.body;
 
-    let updateCourse = await courseRepository.updateById(courseId, { name });
+    let updateCourse = await courseRepository.updateById(courseId, { name , gradeId });
 
     if (updateCourse === false)
         throw new APIError(status.INTERNAL_SERVER_ERROR, {

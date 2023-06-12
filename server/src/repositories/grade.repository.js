@@ -8,11 +8,11 @@ exports.findAll = FactoryRepository
 exports.create = FactoryRepository.create(Grade)
 
 exports.findById = FactoryRepository
-    .findById(Grade, null, [
+    .findById(Grade, { exclude: "currentCourseId"}, [
         {
             model: Course,
             as: "currentCourse",
-            attributes: ["name", "term"]
+            attributes: ["id", "name", "term"]
         }
     ]);
 

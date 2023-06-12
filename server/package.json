@@ -6,7 +6,7 @@
   "scripts": {
     "start": "pm2 start --no-daemon ./src/app.js",
     "start:prod": "pm2 start --no-daemon ./src/app.js",
-    "start:dev": "nodemon ./src/app.js",
+    "start:dev": "nodemon --legacy-watch ./src/app.js",
     "db:migrate": "npx sequelize-cli db:migrate",
     "db:seed": "npx sequelize-cli db:seed:all",
     "test": "jest --runInBand --detectOpenHandles"

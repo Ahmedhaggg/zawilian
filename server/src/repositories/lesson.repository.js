@@ -1,4 +1,4 @@
-const { Unit, db, Exam, Section } = require("../models");
+const { Unit, db, Section } = require("../models");
 const FactoryRepository = require("./factory/index");
 const { catchErrorOnCreate } = require("./errorHandlers");
 
@@ -6,7 +6,7 @@ exports.findById = async (id) => Section
     .findOne({ 
         where: { id, type: "lesson" }, 
         attributes: {
-            exclude: ["type", "examId"] 
+            exclude: ["type", "exam"] 
         }
     })
 
@@ -25,14 +25,12 @@ exports.create = async ({ name, video, exam, description, unitId }) => {
     let transaction = await db.transaction();
     
     try {
-        let newExam = await Exam.create(exam, { transaction });
-
         let newLesson = await Section.create({
             unitId,
             name, 
             video,
             description,
-            examId: newExam.id,
+            exam,
             type: "lesson",
             arrangement: unit.lastSectionArrangement + 1
         }, { transaction });
@@ -49,10 +47,9 @@ exports.create = async ({ name, video, exam, description, unitId }) => {
         
         await transaction.commit();
 
-        return { ...newLesson.dataValues, exam: newExam };
+        return { ...newLesson.dataValues };
 
     } catch (err) {
-        console.log("error before catchError on create", err);
         await transaction.rollback();
         catchErrorOnCreate(err)
     }
@@ -60,31 +57,11 @@ exports.create = async ({ name, video, exam, description, unitId }) => {
 
 exports.updateById = FactoryRepository.updateById(Section);
 
-exports.deleteById = async lessonId => {
-    let lesson = await Section
-        .findOne({ where: { id: lessonId, type: "lesson" }, attributes: ["examId"], raw: true });
-    
-    if (!lesson)
-        return false;
-    
-    let deleteLessonResult = await Section.destroy({
-        where: { id: lessonId },
-    });
-    
-    if (!deleteLessonResult)
-        return false;
-
-    await Exam.destroy({ where: { id: lesson.examId }});
-    
-    return true
-};
-
-
+exports.deleteById = FactoryRepository.deleteById(Section)
 
 exports.findExamByLessonId = async (lessonId) => await (
     await Section.findOne({ 
-        where: { id: lessonId, type: "lesson" },
-        attributes: ["id"],
-        include: [Exam]
+        where: { id: lessonId },
+        attributes: ["exam"],
     })
 ).exam;

@@ -43,6 +43,18 @@ export default function CreateCourse() {
                                 createCourseResult.error?.data?.error?.errors?.name ?
                                     <div className="alert alert-danger">{createCourseResult.error.data.error.errors.name}</div> : null
                             }
+                            
+                            <select className={`form-control form-control-lg mb-3 ${errors.term ? 'border-danger' : ''}`}
+                                {...register("term", { required: true })}
+                            >
+                                <option selected value="">select course term</option>
+                                <option value="first">first</option>
+                                <option value="second">second</option>
+                            </select>
+                            {
+                                createCourseResult.error?.data?.error?.errors?.name ?
+                                    <div className="alert alert-danger">{createCourseResult.error.data.error.errors.name}</div> : null
+                            }
 
                             <div className="text-center">
                                 {

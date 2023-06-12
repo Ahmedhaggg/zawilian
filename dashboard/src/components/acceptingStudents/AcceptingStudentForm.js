@@ -1,160 +1,106 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useGetUnitQuery } from "../../store/unitSlice"
-import { useCreateApplyingStudentMutation } from "../../store/applyingStudentSlice"
+import { useAcceptApplyingStudentMutation } from "../../store/applyingStudentSlice"
 import { useParams } from 'react-router-dom';
-import { capitalizeFirstLetter } from "../../services/helper"
-export default function AcceptStudentForm({ course }) {
-  let { id } = useParams()
-  let { register, handleSubmit, getValues, watch , setValue, reset , formState: { errors } } = useForm({
+import { useGetCourseQuery } from '../../store/courseSlice';
+import PageLoading from '../PageLoading';
+import { Navigate } from "react-router-dom"
+export default function AcceptStudentForm({ courseId }) {
+  let { id } = useParams();
+
+  let { data: courseData, isSuccess: courseIsSuccessLoading }  = useGetCourseQuery(courseId)
+  
+  let { register, handleSubmit, watch , setValue, reset , formState: { errors } } = useForm({
     defaultValues: {
-      nextUnit: "",
-      nextLesson: "",
-      nextUnitRevision: "",
-      nextRevision: ""
+      startUnitId: "",
+      startSectionId: "",
     }
   });
+  let startUnitId = watch("startUnitId");
+  let startSectionId = watch("startSectionId");
 
-  let selectedUnit =  watch("nextUnit");
-  let selectedLesson = watch("nextLesson");
-  let selectedUnitRevision = watch("nextUnitRevision");
-  let selectedCourseRevision = watch("nextRevision");
-  let fetchedUnit = useGetUnitQuery({ courseId: course._id, unitId: selectedUnit }, { skip: selectedUnit ? false : true })
-  let [applyStudent, applyingStudentResult] = useCreateApplyingStudentMutation() 
+  let { data: selectedUnitData } = useGetUnitQuery({ courseId: courseId, unitId: startUnitId }, { skip: startUnitId ? false : true })
   
-  let submitHandler = (values) => {
-    let applyingStudentData = {};
+  
+  let [acceptApplyingStudent, acceptApplyingStudentResult] = useAcceptApplyingStudentMutation() 
+  
+  const submitHandler = (values) => {
+    console.log("values111111", values)
 
-    console.log(values)
+    let selectedSectionArrangement = values.startSectionId ? selectedUnitData.unit.sections
+      .find(section => section.id ===  values.startSectionId).arrangement : 1
+      console.log("values", values)
+
+    acceptApplyingStudent({ 
+      studentId: id, 
+      acceptingStudentData: {
+        startUnitArrangement: selectedUnitData?.unit.arrangement  || 1,
+        startSectionArrangement: selectedSectionArrangement
+      }
+    })
   }
-  console.log(course)
-
-  let handleChangeSelect = (event, field) => {
-    let fieldName = capitalizeFirstLetter(field);
-    let data = {};
-    if (field == "unit")
-      data = course.units.find(unit => unit._id === event.target.value);
-    else if (field === "lesson")
-      data = fetchedUnit.data.unit.lessons.find(lesson => lesson._id === event.target.value);
-    else if (field === "unitRevisions")
-      data = fetchedUnit.data.unit.revisions.find(revision => revision._id === event.target.value);
-    else if (field === "revision")
-      data = course.revisions.find(revision => revision._id === event.target.value);
-    
-    let fieldValue = {};
-    fieldValue[`${field}Id`] = data._id;
-    fieldValue[`arrangement`] = data.arrangement;
-    console.log("this is field value", fieldValue)
-    setValue(`next${fieldName}`, fieldValue);
-  }
-
+  console.log("accepting result", acceptApplyingStudentResult)
   return (
-    <form onSubmit={handleSubmit(submitHandler)} className="text-start">
-      <select 
-        className={`form-select form-select-lg mb-3`}
-        aria-label="select unit"
-        {...register("nextUnit", { required: selectedCourseRevision ? false : true})}
-        onChange={(e) => {
-          reset({
-            nextUnit: "",
-            nextLesson: "",
-            nextUnitRevision: "",
-            nextRevision: ""
-          })
-          setValue("nextUnit", e.target.value)
-        }}
-        disabled={selectedCourseRevision ? true : false}
-      >
-        <option value="">Please select unit progress</option>
-        {
-          course.units.map(
-            unit => (
-              <option 
-                value={unit._id} 
-                key={unit._id}
-              >{unit.name}</option>)
-          )
-        }
-      </select>
-        {
-          fetchedUnit.isSuccess && (
-            <>
-              <select 
-                className={`form-select form-select-lg mb-3`} 
-                aria-label="select unit"
-                {...register("nextLesson", { required: selectedUnit ? true : false })}
-                onChange={(e) => setValue("nextLesson", e.target.value)}
-                disabled={selectedUnitRevision || fetchedUnit.data.unit.lessons.length == 0 ? true : false}
-              >
-                <option value="">Please select lesson progress</option>
-                {
-                  fetchedUnit.data.unit.lessons.map(lesson => (
-                    <option 
-                      value={lesson._id} 
-                      key={lesson._id}
-                    >{lesson.name}</option>
-                  ))
-                }
-              </select>
-              <select 
-                className={`form-select form-select-lg mb-3`} 
-                aria-label="select unit"
-                {...register("nextUnitRevision", { required: selectedUnit ? true : false })}
-                onChange={(e) => setValue("nextUnitRevision", e.target.value)}
-                disabled={selectedLesson || fetchedUnit.data.unit.revisions.length == 0? true : false}
-              >
-                <option value="">Please select unit revision progress</option>
-                {
-                  fetchedUnit.data.unit.revisions.map(revision => 
-                    (
-                      <option 
-                        value={revision._id} 
-                        key={revision._id}
-                      >{revision.name}</option>
-                    )
-                  )
-                }
-              </select>
-            </>
-          )
-        }
-      <select 
-        className={`form-select form-select-lg mb-3`} 
-        aria-label="select unit"
-        {...register("nextRevision", { required: selectedUnit ? false : true})}
-        onChange={(e) => setValue("nextRevision", e.target.value)}
-        disabled={selectedUnit ? true : false}
-      >
-        <option value="">Please select course revision progress</option>
-        {
-          course.revisions.map(revision => (
-            <option 
-              value={revision._id} 
-              key={revision._id}
-            >{revision.name}</option>
-          ))
-        }
-      </select>
-      <div className="text-center">
-        {/* {
-            createGradeResult.data ?
-                <p className="alert alert-success">{createGradeResult.data.message}</p>
-                : null
-        } */}
-        <button 
-          type="submit" 
-          className="btn btn-primary btn-lg" 
-          disabled={
-            selectedUnit && selectedLesson ? false 
-              : selectedUnit && selectedUnitRevision ? false 
-              : selectedCourseRevision ? false : true   
-          }
-        >apply student</button>
+    courseIsSuccessLoading ? 
+      <div>
+        <h4 className='h4 mb-3'>course starting</h4>
+        <form onSubmit={handleSubmit(submitHandler)} className="text-start">
+          <select 
+            className={`form-control form-control-lg mb-3`}
+            aria-label="select unit"
+            {...register("startUnitId", { required: courseData.course.units.length ? true : false})}
+            onChange={(e) => {
+              reset({
+                startUnitId: "",
+                startSectionId: "",
+              })
+              setValue("startUnitId", e.target.value)
+              setValue("startUnitId", e.target.value)
+            }}
+          >
+            <option value="">please select unit which student study from it</option>
+            {
+              courseData.course.units.map(
+                unit => (
+                  <option 
+                    value={unit.id} 
+                    key={unit.id}
+                  >{unit.name}</option>)
+              )
+            }
+          </select>
+          <select 
+            className={`form-control form-control-lg mb-3`} 
+            aria-label="select start section"
+            {...register("startSectionId", { required: selectedUnitData?.unit?.sections.length  ? true : false })}
+            onChange={(e) => setValue("startSectionId", e.target.value)}
+            disabled={ startUnitId && selectedUnitData?.unit?.sections.length ? false : true}
+          >
+            <option value="">Please select start section in unit</option>
+            {
+              selectedUnitData?.unit.sections.map(section => (
+                <option 
+                  value={section.id} 
+                  key={section.id}
+                >{section.name} {section.type}</option>
+              ))
+            }
+          </select>
+          <div className="text-center">
+            <button 
+              type="submit"
+              className="btn btn-primary btn-lg" 
+              disabled={
+                !courseData.course.units.length ? false : 
+                startUnitId && !selectedUnitData?.unit?.sections.length ?  false :
+                startUnitId && startSectionId ? false : true  
+              }
+            >accept</button>
+          </div>
+        </form>
+        { acceptApplyingStudentResult.isSuccess &&  <Navigate to={"/students/" + id }/> }
       </div>
-        {/* {
-          createGradeResult.error?.data?.error?.errors?.currentCourse ?
-              <p className="alert alert-danger">{createGradeResult.error.data.error.errors.currentCourse}</p> : null
-        } */}
-    </form>
+    : <PageLoading />
   )
 }

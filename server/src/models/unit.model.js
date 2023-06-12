@@ -22,6 +22,10 @@ const Unit = db.define("unit", {
     lastSectionArrangement: {
         type: DataTypes.TINYINT,
         defaultValue: 0
+    },
+    exam: {
+        type: DataTypes.JSONB,
+        allowNull: true
     }
 }, {
     timestamps: true,

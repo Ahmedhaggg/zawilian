@@ -23,15 +23,13 @@ const APIError = require("../errors/api.error");
 
 exports.store = async (req, res, next) => {
     let { unitId } = req.params;
-    let { name, video, description, exam : { points, questions } } = req.body;
+    let { name, video, description, exam : { questions } } = req.body;
 
     let newRevision = await revisionRepository.create(
         {
             name,
             video,
-            exam: {
-                points, questions
-            },
+            exam: { questions },
             description,
             unitId
         }

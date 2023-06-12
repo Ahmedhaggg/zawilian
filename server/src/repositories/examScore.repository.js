@@ -1,15 +1,13 @@
 const { ExamScore, Student, Section, CourseRevision, Unit } = require("../models");
 const FactoryRepository = require("./factory/index");
-const { catchErrorOnCreate } = require("./errorHandlers");
 const { Op } = require("sequelize");
+const { transformExamsScores } = require("./helpers/transformExamsScores");
 
 exports.create = FactoryRepository.create(ExamScore);
 
-exports.findStudentsScoreByExamId = async (examId) => await ExamScore 
+exports.findStudentsScoresInExam = async (query) => await ExamScore 
     .findAll({
-        where: {
-            examId
-        },
+        where: query,
         attributes: ["score"],
         include: [
             {
@@ -17,44 +15,49 @@ exports.findStudentsScoreByExamId = async (examId) => await ExamScore
                 attributes: ["id", "name", "phoneNumber"]
             }
         ]
-    })
+    });
 
-
-exports.findStudentCourseExamsScore = async studentId => await ExamScore
-    .findAll({
-        where: { 
-            studentId,
-            [Op.or]: [
-                { unitId: { [Op.not]: null } },
-                { courseRevisionId: { [Op.not]: null } }
-            ],
-        },
-        include: [
-            {
-                required: false,
-                model: Unit,
-                include: [
-                    {
-                        model: Section,
-                        include: [
-                            {
-                                model: ExamScore,
-                                attributes: ['score'],
-                                where: { studentId }
-                            }
-                        ],
-                        attributes: ['id', 'name', "arrangement", "type"],
-                        order: [Section, 'arrangement', 'ASC']
-                    }
+exports.findStudentCourseExamsScore = async studentId => {
+    let examsScores = await ExamScore
+        .findAll({
+            where: { 
+                studentId,
+                [Op.or]: [
+                    { unitId: { [Op.not]: null } },
+                    { courseRevisionId: { [Op.not]: null } }
                 ],
-                attributes: ['id', 'name', "arrangement"],
             },
-            {
-                required: false,
-                model: CourseRevision,
-                attributes: ['id', 'name', "arrangement"]
-            }
-        ],
-        attributes: ["score"],
-        order: [[Unit, 'arrangement', 'ASC'], [CourseRevision, 'arrangement', 'ASC']]
-    })
+            include: [
+                {
+                    required: false,
+                    model: Unit,
+                    include: [
+                        {
+                            model: Section,
+                            include: [
+                                {
+                                    model: ExamScore,
+                                    attributes: ['score'],
+                                    where: { studentId }
+                                }
+                            ],
+                            attributes: ['id', 'name', "arrangement", "type"]
+                        }
+                    ],
+                    attributes: ['id', 'name', "arrangement"],
+                },
+                {
+                    required: false,
+                    model: CourseRevision,
+                    attributes: ['id', 'name', "arrangement"]
+                }
+            ],
+            attributes: ["score"],
+            order: [
+                [Unit, 'arrangement', 'ASC'], 
+                [CourseRevision, 'arrangement', 'ASC'],
+            ]
+        });
+        
+    return transformExamsScores(examsScores)
+}

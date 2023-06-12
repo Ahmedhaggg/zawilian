@@ -27,6 +27,10 @@ const Section = db.define("section", {
         type: DataTypes.ENUM,
         values: ['lesson', 'revision'],
         allowNull: false
+    },
+    exam: {
+        type: DataTypes.JSONB,
+        allowNull: false,
     }
 }, {
     timestamps: true,

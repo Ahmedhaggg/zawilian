@@ -21,7 +21,7 @@ exports.index = async (req, res, next) => {
         gradeId
     } = req.query;
 
-    let students = await studentRepository.findAll(gradeId ? { gradeId, accepted: true } : {}, offset, limit);
+    let students = await studentRepository.findAll(gradeId ? { gradeId, accepted: true } : { accepted: true }, offset, limit);
 
     res.status(status.OK).json({
         success: true,

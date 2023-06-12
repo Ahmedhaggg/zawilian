@@ -7,10 +7,6 @@ const { cleanDatabase } = require('../testHelper');
 describe('course endpoints', () => {
     let teacherToken;
     let studentToken;
-    let unitExamId;
-    let courseRevisionExamId;
-    let lessonExamId;
-    let unitRevisionExamId;
     let unitId;
     let courseRevisionId;
     let lessonId;
@@ -20,50 +16,44 @@ describe('course endpoints', () => {
         await db.authenticate();
         let newCourse = await Course.create({ ...testData.courseData });
         courseId = newCourse.id;
+
+        let newGrade = await Grade.create({ ...testData.gradeData, gradeId: newCourse.id })
+
         // insert unit and exam
-        unitExamId = await (await Exam.create(testData.unitExamData)).id
         let newUnit = await Unit.create({ 
             ...testData.unitData, 
             courseId: newCourse.id, arrangement: 1, 
-            examId: unitExamId
+            exam: testData.unitExamData
         });
         unitId = newUnit.id;
+
         // insert courseRevision and exam
-        courseRevisionExamId = await (await Exam.create(testData.courseRevisionsData.exam)).id
         let newCourseRevision = await CourseRevision.create({ 
-            video: testData.courseRevisionsData.video,
-            name: testData.courseRevisionsData.name,
-            description: testData.courseRevisionsData.description,
-            courseId: newCourse.id,
+            ...testData.courseRevisionsData,
+            courseId: newCourse.id, 
             arrangement: 1, 
-            examId: courseRevisionExamId
         });
         courseRevisionId = newCourseRevision.id;
+
         // insert lesson and exam
-        lessonExamId = await (await Exam.create(testData.lessonData.exam)).id
         let newLesson = await Section.create({ 
-            video: testData.courseRevisionsData.video,
-            name: testData.courseRevisionsData.name,
-            description: testData.courseRevisionsData.description,
-            type: "lesson",
+            ...testData.lessonData,
             unitId: newUnit.id,
+            type: "lesson",
             arrangement: 1, 
-            examId: lessonExamId
         });
         lessonId = newLesson.id;
+
         // insert unit and exam
-        unitRevisionExamId = await (await Exam.create(testData.unitRevisionData.exam)).id
         let newUnitRevision = await Section.create({ 
-            video: testData.courseRevisionsData.video,
-            name: testData.courseRevisionsData.name,
-            description: testData.courseRevisionsData.description,
+            ...testData.unitRevisionData,
             unitId: newUnit.id,
             type: "revision",
             arrangement: 2, 
-            examId: unitRevisionExamId
         });
         unitRevisionId = newUnitRevision.id;
-        let student = await Student.create(testData.studentData);
+
+        let student = await Student.create({gradeId: newGrade.id ,...testData.studentData});
         studentId = student.id;
         teacherToken = await createJwtToken({ role: "teacher", }, "1h")
         studentToken = await createJwtToken({ role: "student", id: student.id  }, "1h")
@@ -78,7 +68,6 @@ describe('course endpoints', () => {
             const { status, body } = await request(app)
                 .post(`/api/v2/exams-scores`)
                 .send({
-                    examId: unitExamId,
                     unitId: unitId,
                     score: 9
                 })
@@ -92,7 +81,6 @@ describe('course endpoints', () => {
             const { status, body } = await request(app)
                 .post(`/api/v2/exams-scores`)
                 .send({
-                    examId: lessonExamId,
                     sectionId: lessonId,
                     score: 8
                 })
@@ -106,7 +94,6 @@ describe('course endpoints', () => {
             const { status, body } = await request(app)
                 .post(`/api/v2/exams-scores`)
                 .send({
-                    examId: unitRevisionExamId,
                     sectionId: unitRevisionId,
                     score: 7
                 })
@@ -120,7 +107,6 @@ describe('course endpoints', () => {
             const { status, body } = await request(app)
                 .post(`/api/v2/exams-scores`)
                 .send({
-                    examId: courseRevisionExamId,
                     courseRevisionId,
                     score: 6
                 })
@@ -131,9 +117,48 @@ describe('course endpoints', () => {
         });
     });
     describe('GET /api/v2/exams-score/exams/:examId', () => {
-        test('should return students scores in specific exam', async () => {
+        test('should return students scores in specific unit', async () => {
             const { status, body } = await request(app)
-                .get(`/api/v2/exams-scores/exams/` + unitExamId)
+                .get(`/api/v2/exams-scores/exam`)
+                .query({
+                    unitId
+                })
+                .set("authorization", teacherToken)
+
+            expect(status).toBe(200);
+            expect(body.success).toBe(true);
+            expect(body).toHaveProperty("studentsScore");
+        });
+        test('should return students scores in specific lesson', async () => {
+            const { status, body } = await request(app)
+                .get(`/api/v2/exams-scores/exam`)
+                .query({
+                    sectionId: lessonId
+                })
+                .set("authorization", teacherToken)
+
+            expect(status).toBe(200);
+            expect(body.success).toBe(true);
+            expect(body).toHaveProperty("studentsScore");
+        });
+        test('should return students scores in unit revision', async () => {
+            const { status, body } = await request(app)
+                .get(`/api/v2/exams-scores/exam`)
+                .query({
+                    sectionId: unitRevisionId
+                })
+                .set("authorization", teacherToken)
+
+            expect(status).toBe(200);
+            expect(body.success).toBe(true);
+            expect(body).toHaveProperty("studentsScore");
+        });
+        test('should return students scores in course revision', async () => {
+            const { status, body } = await request(app)
+                .get(`/api/v2/exams-scores/exam`)
+                .query({
+                    courseRevisionId
+                })
                 .set("authorization", teacherToken)
 
             expect(status).toBe(200);
@@ -157,7 +182,6 @@ describe('course endpoints', () => {
             const { status, body } = await request(app)
                 .get(`/api/v2/exams-scores/students/` + studentId)
                 .set("authorization", teacherToken)
-
             expect(status).toBe(200);
             expect(body.success).toBe(true);
             expect(body).toHaveProperty("studentCourseExamScore");

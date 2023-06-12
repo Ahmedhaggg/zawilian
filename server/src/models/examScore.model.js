@@ -1,10 +1,16 @@
 const { db } = require('../config/database');
 const { DataTypes } = require('sequelize');
 
-const ExamSocre = db.define("examSocre", {
+const ExamSocre = db.define("examScore", {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     courseRevisionId: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        primaryKey: true,
         references: {
           model: 'CourseRevision',
           key: 'id'
@@ -13,6 +19,7 @@ const ExamSocre = db.define("examSocre", {
     unitId: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        primaryKey: true,
         references: {
             model: 'Unit',
             key: 'id'
@@ -21,17 +28,9 @@ const ExamSocre = db.define("examSocre", {
     sectionId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: {
-            model: 'Section',
-            key: 'id'
-        }
-    },
-    examId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
         primaryKey: true,
         references: {
-            model: 'Exam',
+            model: 'Section',
             key: 'id'
         }
     },
@@ -45,7 +44,8 @@ const ExamSocre = db.define("examSocre", {
     }
 }, {
     timestamps: false,
-    tableName: "ExamScore"
+    tableName: "ExamScore",
+    
 })
 
 

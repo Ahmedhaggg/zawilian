@@ -10,8 +10,6 @@ export default function ApplyingStudent() {
     let { id } = useParams();
     let {data, isLoading, isSuccess} = useGetApplyingStudentQuery(id);
     let [showAcceptStudentForm, setShowAcceptStudentForm] = useState(false);
-    let course = useGetCourseQuery( isSuccess ?  data.unAcceptedStudent.currentCourse._id : null , { skip: !showAcceptStudentForm });
-
     
     return (
         isLoading ? <PageLoading />
@@ -24,32 +22,34 @@ export default function ApplyingStudent() {
                                 <li className="list-group-item">
                                     <div className="row py-2 ">
                                         <div className="col-3">name</div>
-                                        <div className="col-9 text-center">{data.unAcceptedStudent.name}</div>
+                                        <div className="col-9 text-center">{data.applyingStudent.name}</div>
+                                    </div>
+                                </li>
+                                <li className="list-group-item">
+                                    <div className="row py-2 ">
+                                        <div className="col-3">email</div>
+                                        <div className="col-9 text-center">{data.applyingStudent.email}</div>
+                                    </div>
+                                </li>
+                                <li className="list-group-item">
+                                    <div className="row py-2 ">
+                                        <div className="col-3">phone</div>
+                                        <div className="col-9 text-center">{data.applyingStudent.phoneNumber}</div>
                                     </div>
                                 </li>
                                 <li className="list-group-item">
                                     <div className="row py-2">
                                         <div className="col-3">grade</div>
-                                        <div className="col-9 text-center">{data.unAcceptedStudent.grade.name}</div>
-                                    </div>
-                                </li>
-                                <li className="list-group-item">
-                                    <div className="row py-2 align-items-center">
-                                        <div className="col-3">phone</div>
-                                        <div className="col-9 text-center">{data.unAcceptedStudent.phoneNumber}</div>
+                                        <div className="col-9 text-center">{data.applyingStudent.grade.name}</div>
                                     </div>
                                 </li>
                             </ul>
                         </div>
                         {
                             !showAcceptStudentForm ?  
-                                <button type="button" className="btn btn-primary btn-lg" onClick={() => setShowAcceptStudentForm(true)}>Accept</button>
-                            :   (
-                                course.isLoading ? <PageLoading /> :
-                                    course.isSuccess ?
-                                        <AcceptStudentForm course={course.data.course} />
-                                    : <Navigate to={"/404"}/>
-                            )
+                                <button type="button" className="btn btn-primary btn-lg" onClick={() => setShowAcceptStudentForm(true)}>accept form </button>
+                            :   
+                                <AcceptStudentForm courseId={data.applyingStudent.grade.currentCourseId} />
                         }
                 </div>
             )

@@ -16,6 +16,10 @@ module.exports = {
         type: Sequelize.INTEGER(3),
         allowNull: false,
       },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -36,6 +40,14 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+      lastSectionArrangement: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
+      exam: {
+        type: Sequelize.JSONB,
+        allowNull: true,
+      }
     });
   },
 

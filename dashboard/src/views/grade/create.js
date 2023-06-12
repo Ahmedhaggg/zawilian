@@ -8,7 +8,7 @@ import PageLoading from "../../components/PageLoading";
 
 export default function CreateGrade() {
     let [redirect, setRedirect] = useState(false);
-    let getCourses = useGetAllCoursesQuery();
+    let courses = useGetAllCoursesQuery();
     let [createGrade, createGradeResult] = useCreateGradeMutation();
 
     const {
@@ -18,9 +18,10 @@ export default function CreateGrade() {
     } = useForm();
 
     let submitHandler = (values) => {
+        console.log(values);
         createGrade(values)
     }
-
+    
     useEffect(() => {
         let timeout;
         if (createGradeResult.isSuccess) {
@@ -29,18 +30,18 @@ export default function CreateGrade() {
         return () => clearTimeout(timeout);
 
     }, [createGradeResult]);
-
+    
     return (
         <>
             {redirect && <Navigate to="/grades" />}
 
             {
-                getCourses.isLoading ? <PageLoading />
+                courses.isLoading ? <PageLoading />
                     : <>
-                        {!getCourses.isSuccess ?
+                        {!courses.isSuccess ?
                             <Navigate to="/505" /> : <>
                                 {
-                                    getCourses.data.courses.length > 0 ?
+                                    courses.data.courses.length > 0 ?
                                         <div className="dashboard-section">
                                             <SectionHeader text="create grade" />
                                             <div className="row">
@@ -56,15 +57,16 @@ export default function CreateGrade() {
                                                                 <div className="alert alert-danger">{createGradeResult.error.data.error.errors.name}</div> : null
                                                         }
 
-                                                        <select className={`form-select form-select-lg mb-3 ${errors.currentCourse ? 'border-danger' : ''}`} aria-label="select currentCourse"
-                                                            {...register("currentCourse", { required: true })}
+                                                        <select className={`form-control form-control-lg mb-3 ${errors.currentCourseId ? 'border-danger' : ''}`} aria-label="select currentCourse"
+                                                            {...register("currentCourseId", { required: true })}
                                                         >
-                                                            {getCourses.data.courses.map(course => <option value={course._id} key={course._id}>{course.name}</option>)}
+                                                            <option value="">select current course</option>
+                                                            {courses.data.courses.map(course => <option value={course.id} key={course.id}>{course.name}</option>)}
                                                         </select>
 
                                                         {
-                                                            createGradeResult.error?.data?.error?.errors?.currentCourse ?
-                                                                <p className="alert alert-danger">{createGradeResult.error.data.error.errors.currentCourse}</p> : null
+                                                            createGradeResult.error?.data?.error?.errors?.currentCourseId ?
+                                                                <p className="alert alert-danger">{createGradeResult.error.data.error.errors.currentCourseId}</p> : null
                                                         }
 
                                                         <div className="text-center">

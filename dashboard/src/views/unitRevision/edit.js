@@ -14,11 +14,10 @@ export default function EditUnitRevision() {
     let { register, handleSubmit, formState: { errors } } = useForm();
 
     let submitHandler = (newRevisionData) => {
-        updateRevision({ unitId, revisionId, newRevisionData })
+        updateRevision({ courseId, unitId, revisionId, newRevisionData })
     }
 
     useEffect(() => {
-        console.log(updateRevisionResult)
         let timeout;
         if (updateRevisionResult.isSuccess) {
             timeout = setTimeout(() => { setRedirect(true) }, 2000);

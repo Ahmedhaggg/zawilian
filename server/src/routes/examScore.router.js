@@ -12,11 +12,10 @@ router.post("/",
     catchErrors(studentController.store)
 );
 
-router.get("/exams/:examId", 
+router.get("/exam", 
     guards.guard("teacher"),
     catchErrors(studentController.showStudentsScoresInExam)
 );
-
 
 router.get("/students/:studentId?", 
     guards.guard("teacher", "student"),

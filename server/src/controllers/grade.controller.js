@@ -25,9 +25,9 @@ exports.store = async (req, res, next) => {
 
 exports.show = async (req, res, next) => {
     let { gradeId } = req.params;
-
+    
     let grade = await gradeRepository.findById(gradeId);
-    console.log(grade)
+    
     if (!grade)
         throw new APIError(
             status.NOT_FOUND,

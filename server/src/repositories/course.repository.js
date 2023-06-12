@@ -5,27 +5,30 @@ exports.findAll = FactoryRepository
     .findAll(Course, null, [
         {
             model: Grade,
-            attributes: ["name"]
+            attributes: ["id", "name"]
         }
     ])
 
-
 exports.create = FactoryRepository.create(Course)
 
-exports.findById = FactoryRepository
-    .findById(Course, null, [
+exports.findById = async (id) => await Course.findOne({ 
+    where: { id },
+    include: [
         {
             model: Grade,
-            attributes: ["name"]
+            attributes: ["id", "name"]
         },
         {
             model: Unit,
-            order: [["arrangement", "ASC"]]
+            order: [["arrangement", "ASC"]],
+            attributes: ["id", "name", "arrangement"]
         },
         {
             model: CourseRevision,
-            order: [["arrangement", "ASC"]]
+            order: [["arrangement", "ASC"]],
+            attributes: ["id", "name", "arrangement"]
         }
-    ]);
-
+    ],
+    order: [[Unit, "arrangement", "ASC"], [CourseRevision, "arrangement", "ASC"]]
+})
 exports.updateById = FactoryRepository.updateById(Course)

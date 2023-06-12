@@ -13,9 +13,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      term: {
-        type: Sequelize.ENUM('1', '2'),
-      },
       lastUnitArrangement: {
         type: Sequelize.INTEGER,
         defaultValue: 0,

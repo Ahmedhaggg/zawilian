@@ -53,7 +53,6 @@ exports.unitData = {
 }
 
 exports.unitExamData = {
-    points: 10,
     questions: [
         {
             question: "question 1",

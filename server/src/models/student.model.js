@@ -15,7 +15,8 @@ const Student = db.define('student', {
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     password: {
         type: DataTypes.STRING,
@@ -23,7 +24,8 @@ const Student = db.define('student', {
     },
     phoneNumber: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     accepted: {
         type: DataTypes.BOOLEAN,

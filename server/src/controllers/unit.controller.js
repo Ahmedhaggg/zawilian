@@ -89,7 +89,7 @@ exports.showExam = async (req, res, next) => {
 
 exports.storeExam = async (req, res, next) => {
     let { unitId } = req.params;
-    let { points, questions } = req.body;
+    let { questions } = req.body;
     let unitExam = await unitRepository.findExamByUnitId(unitId);
 
     if (unitExam)
@@ -98,11 +98,11 @@ exports.storeExam = async (req, res, next) => {
             unitExam
         });
 
-    let newUnitExam = await unitRepository.createExam(unitId, { points, questions });
+    await unitRepository.createExam(unitId, { questions });
 
     res.status(status.OK).json({
         success: true,
-        unitExam: newUnitExam,
+        unitExam: { questions },
         message: messages.unit.success.createExam
     });
 }

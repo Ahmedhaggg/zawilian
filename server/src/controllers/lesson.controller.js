@@ -24,17 +24,14 @@ exports.show = async (req, res, next) => {
 
 exports.store = async (req, res, next) => {
     let { unitId } = req.params;
-    let { name, video, description, exam: { points, questions } } = req.body;
+    let { name, video, description, exam: { questions } } = req.body;
 
 
     let newLesson = await lessonRepository.create(
         {
             name,
             video,
-            exam: {
-                points,
-                questions
-            },
+            exam: { questions },
             description,
             unitId
         }, 

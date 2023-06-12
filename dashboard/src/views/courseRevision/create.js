@@ -28,7 +28,6 @@ export default function CreateCourseRevision() {
                 description: newCourseRevisionData.description,
                 video: newCourseRevisionData.video,
                 exam: {
-                    degree: newCourseRevisionData.examDegree,
                     questions: newCourseRevisionData.questions
                 }
             }
@@ -75,17 +74,7 @@ export default function CreateCourseRevision() {
 
                                     <div className="exam">
                                         <p className="text-start fs-5 text-second-color">exam</p>
-                                        <input
-                                            className={`form-control form-control-lg mb-3 ${errors.examDegree ? 'border-danger' : ''}`} type="number"
-                                            placeholder="degree" aria-label="degree"
-                                            {...register(`examDegree`, { required: true })}
-                                        />
-                                        {
-                                            createCourseRevisionResult.error?.data?.error?.errors?.exam?.degree ?
-                                                <div className="alert alert-danger">{createCourseRevisionResult.error.data.error.errors.name}</div> : null
-                                        }
                                         <Questions register={register} control={control} errors={errors} />
-
                                     </div>
 
                                     <div className="text-center">

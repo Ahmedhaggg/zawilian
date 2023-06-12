@@ -73,30 +73,32 @@ describe('course endpoints', () => {
         });
     });
     describe('POST /api/v2/courses/:courseId/units/:unitId/exam', () => {
-        test('should find course unit', async () => {
+        test('should add exam to unit', async () => {
             const { status, body } = await request(app)
                 .post(`/api/v2/courses/${courseId}/units/${unitId}/exam`)
                 .send(testData.unitExamData)
                 .set("authorization", teacherToken)
-
+            console.log("add exam to unit", body)
             expect(status).toBe(200);
             expect(body.success).toBe(true);
         });
     });
     describe('GET /api/v2/courses/:courseId/units/:unitId/exam', () => {
-        test('should find course unit', async () => {
+        test('should find course unit for teacher', async () => {
             const { status, body } = await request(app)
                 .get(`/api/v2/courses/${courseId}/units/${unitId}/exam`)
                 .set("authorization", teacherToken)
+                console.log("get exam from unit", body)
 
             expect(status).toBe(200);
             expect(body.success).toBe(true);
             expect(body).toHaveProperty("exam");
         });
-        test('should update course unit', async () => {
+        test('should update course unit for student', async () => {
             const { status, body } = await request(app)
                 .get(`/api/v2/courses/${courseId}/units/${unitId}/exam`)
                 .set("authorization", studentToken);
+                console.log("get exam from unit", body)
 
             expect(status).toBe(200);
             expect(body.success).toBe(true);

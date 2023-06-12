@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 
 export default function Questions({ register, control, errors }) {
-    // const { register, control, handleSubmit } = useForm();
     const { fields, append, remove } = useFieldArray({
         control,
         name: "questions"
@@ -15,21 +14,16 @@ export default function Questions({ register, control, errors }) {
                     <div key={item.id} className="mb-3">
                         <textarea
                             className={`form-control form-control-lg mb-3 ${errors[index]?.question ? 'border-danger' : ''}`} type="text"
-                            placeholder="question" aria-label="question"
+                            placeholder={`question ${index + 1}`} aria-label="question"
                             {...register(`questions[${index}][question]`, { required: true })}
                         ></textarea>
-                        <input
-                            className={`form-control form-control-lg mb-3 ${errors[index]?.question ? 'border-danger' : ''}`} type="text"
-                            placeholder="question" aria-label="question"
-                            {...register(`questions[${index}][question]`, { required: true })}
-                        />
                         <div>
                             {
-                                Array.from(Array(4), (element, i) => (
+                                Array.from(Array(4), (_, i) => (
                                     <input
                                         key={i}
                                         className={`form-control form-control-lg mb-3 ps-4 ${errors[index]?.answers[i] ? 'border-danger' : ''}`} type="text"
-                                        placeholder="question" aria-label="question"
+                                        placeholder={`answer ${i + 1}`} aria-label="answer"
                                         {...register(`questions[${index}][answers][${i}]`, { required: true })}
                                     />
                                 ))
@@ -38,21 +32,16 @@ export default function Questions({ register, control, errors }) {
                         <div className="row">
                             <div className="col-8">
                                 <select 
-                                    className={`form-select form-control-lg mb-3 ${errors.question ? 'border-danger' : ''}`} type="text"
+                                    className={`form-control form-control-lg mb-3 ${errors.question ? 'border-danger' : ''}`}
                                     placeholder="correct answer" aria-label="correct answer"
                                     {...register(`questions[${index}][correctAnswer]`, { required: true })}
                                 >
                                     {
                                         Array.from(Array(4), (element, i) => (
-                                            <option value={i}>answer {i + 1}</option>
+                                            <option value={i} key={i}>answer {i + 1}</option>
                                         ))
                                     }
                                 </select>
-                                {/* <input
-                                    className={`form-control form-control-lg mb-3 ${errors.question ? 'border-danger' : ''}`} type="text"
-                                    placeholder="correct answer" aria-label="correct answer"
-                                    {...register(`questions[${index}][correctAnswer]`, { required: true })}
-                                /> */}
                             </div>
                             <div className="col-4">
                                 <div className="text-center">

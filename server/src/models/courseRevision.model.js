@@ -22,6 +22,10 @@ const CourseRevision = db.define("courseRevision", {
     video: {
         type: DataTypes.TEXT,
         allowNull: false
+    },
+    exam: {
+        type: DataTypes.JSONB,
+        allowNull: false,
     }
 }, {
     timestamps: true,

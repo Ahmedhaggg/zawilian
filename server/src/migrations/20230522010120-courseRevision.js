@@ -44,6 +44,10 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+      exam: {
+        type: Sequelize.JSONB,
+        allowNull: false,
+      }
     });
   },
 

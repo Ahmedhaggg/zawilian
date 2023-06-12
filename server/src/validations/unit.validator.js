@@ -15,7 +15,6 @@ module.exports = {
                 return mainRules
             case "storeExam":
                 return [
-                    check("points").notEmpty().withMessage(messages.genrale.required),
                     check("questions").not().isEmpty().withMessage(messages.genrale.required),
                     check("questions[*]question").not().isEmpty().withMessage(messages.genrale.required),
                     check("questions[*]answers").not().isEmpty().withMessage(messages.genrale.required),

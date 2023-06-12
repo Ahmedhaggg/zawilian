@@ -16,10 +16,10 @@ export default function CreateUnit() {
         formState: { errors }
     } = useForm();
 
-    let submitHandler = (newUnitData) => {
+    let submitHandler = (newUnit) => {
         createUnit({
             courseId,
-            newUnitData
+            newUnit
         })
     }
 
@@ -35,18 +35,27 @@ export default function CreateUnit() {
     return (
                 <>
                     <div className="dashboard-section">
-                        <SectionHeader text="addUnit to course " />
+                        <SectionHeader text="add unit to course " />
                         <div className="row">
                             <div className="col-12 col-md-8 offset-md-2">
                                 <form onSubmit={handleSubmit(submitHandler)}>
+                                    
                                     <input className={`form-control form-control-lg mb-3 ${errors.name ? 'border-danger' : ''}`} type="text"
                                         placeholder="name" aria-label="name"
                                         {...register("name", { required: true })}
                                     />
-
                                     {
                                         createUnitResult.error?.data?.error?.errors?.name ?
                                             <div className="alert alert-danger">{createUnitResult.error.data.error.errors.name}</div> : null
+                                    }
+
+                                    <textarea className={`form-control form-control-lg mb-3 ${errors.name ? 'border-danger' : ''}`}
+                                        placeholder="description" aria-label="description"
+                                        {...register("description", { required: true })}
+                                    ></textarea>
+                                    {
+                                        createUnitResult.error?.data?.error?.errors?.description ?
+                                            <div className="alert alert-danger">{createUnitResult.error.data.error.errors.description}</div> : null
                                     }
 
                                     <div className="text-center">

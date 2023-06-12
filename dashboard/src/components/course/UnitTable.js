@@ -11,15 +11,15 @@ export default function UnitTable({ tableHead, tableBody }) {
             </thead>
             <tbody>
                 {tableBody.map(bodyItem => (
-                    <tr className="text-center" key={bodyItem._id}>
+                    <tr className="text-center" key={bodyItem.id}>
                         <td data-title="unit" className="fs-6">
-                            <Link className="text-black-color text-decoration-none" to={"/units/" + bodyItem._id}>{bodyItem.name}</Link>
+                            <Link className="text-black-color text-decoration-none" to={"/units/" + bodyItem.id}>{bodyItem.name}</Link>
                         </td>
                         <td data-title="arrangement" className="fs-6">
                             {bodyItem.arrangement}
                         </td>
                         <td data-title="update unit">
-                            <Link to={"/units/" + bodyItem._id + "/edit"} className="text-decoration-none">
+                            <Link to={"/units/" + bodyItem.id + "/edit"} className="text-decoration-none">
                                 update
                             </Link>
                         </td>

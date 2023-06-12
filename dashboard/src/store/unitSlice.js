@@ -1,52 +1,53 @@
 import { apiSlice } from "./apiSlice";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { getToken } from "../services/storage";
 
 export const unitSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getCourseUnits: builder.query({
-            query: (courseId) => {
-                return {
-                    url: `courses/${courseId}/units`,
-                    method: "GET",
-                    headers: {
-                        'authorization': getToken()
-                    }
-                }
-            },
-            providesTags: ["Unit"]
-        }),
         getUnit: builder.query({
             query: ({ courseId, unitId }) => {
                 return {
-                    url: `courses/${courseId}/units/${unitId}`,
+                    url: `v2/courses/${courseId}/units/${unitId}`,
                     method: "GET",
                     headers: {
                         'authorization': getToken()
                     }
                 }
             },
-            providesTags: ["Unit", "Lesson"]
         }),
         createUnit: builder.mutation({
-            query: ({ courseId, newUnitData }) => {
+            query: ({ courseId, newUnit }) => {
                 return ({
-                    url: `courses/${courseId}/units`,
+                    url: `v2/courses/${courseId}/units`,
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json',
                         'authorization': getToken()
                     },
-                    body: JSON.stringify(newUnitData)
+                    body: JSON.stringify(newUnit)
                 })
             },
-            invalidatesTags: ["Unit", "Course"]
+            async onQueryStarted({ courseId, _newUnit }, { dispatch, queryFulfilled }) {
+                try {
+                    let { data } = await queryFulfilled;
+                    if (!data)
+                        return;
+                    dispatch(
+                        apiSlice.util.updateQueryData('getCourse', courseId, (draft) => {
+                            draft.course.units.push({
+                                id: data.newUnit,
+                                name: data.newUnit.name,
+                                arrangement: data.newUnit.arrangement
+                            })
+                        })
+                    )
+                } catch (_) {}
+            }
         }),
         updateUnit: builder.mutation({
             query: ({ courseId, unitId, newUnitData }) => {
                 return ({
-                    method: "PUT",
-                    url: `courses/${courseId}/units/${unitId}`,
+                    method: "PATCH",
+                    url: `v2/courses/${courseId}/units/${unitId}`,
                     headers: {
                         'Content-Type': 'application/json',
                         'authorization': getToken()
@@ -54,20 +55,123 @@ export const unitSlice = apiSlice.injectEndpoints({
                     body: JSON.stringify(newUnitData)
                 })
             },
-            invalidatesTags: ["Unit", "Course"]
+            async onQueryStarted({ courseId, unitId, newUnitData }, { dispatch, queryFulfilled }) {
+                try {
+                    let { data } = await queryFulfilled;
+                    if (!data.success)
+                        return;
+ 
+                    dispatch(
+                        apiSlice.util.updateQueryData('getCourse', courseId, (draft) => {
+                            const updatedUnitIndex = draft.course.units.findIndex((unit) => unit.id === parseInt(unitId));
+                            if (updatedUnitIndex !== -1) {
+                                let units = [
+                                    ...draft.course.units.slice(0, updatedUnitIndex),
+                                    {
+                                      ...draft.course.units[updatedUnitIndex],
+                                      name: newUnitData.name,
+                                    },
+                                    ...draft.course.units.slice(updatedUnitIndex + 1),
+                                ];
+                                
+                                Object.assign(draft, {
+                                    ...draft,
+                                    course: {
+                                        ...draft.course,
+                                        units
+                                    },
+                                })
+                            }
+                        })
+                    )
+                    dispatch(
+                        apiSlice.util.updateQueryData('getUnit', { courseId, unitId }, (draft) => {
+                            Object.assign(draft, {
+                                ...draft,
+                                unit: {
+                                    ...draft.unit,
+                                    name: newUnitData.name,
+                                    description: newUnitData.description
+                                },
+                            })
+                        })
+                    )
+
+                } catch (error) {console.log(error)}
+            }
         }),
-        getNextUnitArrangement: builder.query({
-            query: (id) => {
-                return {
-                    url: `courses/${id}/units/next-arrangement`,
+        deleteUnit: builder.mutation({
+            query: ({ courseId, unitId }) => {
+                return ({
+                    method: "DELETE",
+                    url: `v2/courses/${courseId}/units/${unitId}`,
+                    headers: {
+                        'authorization': getToken()
+                    },
+                })
+            },
+            async onQueryStarted({ courseId, unitId }, { dispatch, queryFulfilled }) {
+                try {
+                    let { data } = await queryFulfilled;
+                    if (!data.success)
+                        return;
+
+                    dispatch(
+                        apiSlice.util.updateQueryData('getCourse', courseId, (draft) => {
+                            let units = draft.course.units.filter(unit => unit.id !== unitId)
+                            Object.assign(draft, {
+                                ...draft,
+                                course: {
+                                    ...draft.course,
+                                    units
+                                }
+                            })
+                        })
+                    )
+                    dispatch(
+                        apiSlice.util.updateQueryData('getUnit', { courseId, unitId }, draft => {
+                            delete draft.unit;
+                        })
+                    )
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+        }),
+        addExamToUnit: builder.mutation({
+            query: ({ courseId, unitId, newExamData }) => {
+                return ({
+                    url: `v2/courses/${courseId}/units/${unitId}/exam`,
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'authorization': getToken()
+                    },
+                    body: JSON.stringify(newExamData)
+                })
+            },
+        }),
+        getUnitExam: builder.query({
+            query: ({ courseId , unitId }) => {
+                return ({
+                    url: `v2/courses/${courseId}/units/${unitId}/exam`,
                     method: "GET",
                     headers: {
                         'authorization': getToken()
                     }
-                }
-            }
+                })
+            },
         })
     })
 });
 
-export const { useGetCourseUnitsQuery, useGetUnitQuery, useCreateUnitMutation, useUpdateUnitMutation, useGetNextUnitArrangementQuery } = unitSlice;
+export const { 
+    useGetUnitQuery, 
+    useCreateUnitMutation,
+    useUpdateUnitMutation, 
+    useDeleteUnitMutation,
+    useAddExamToUnitMutation,
+    useGetUnitExamQuery
+} = unitSlice;
+
+

@@ -17,10 +17,11 @@ code {
 }
 
 :root {
-  --mainColor: #d32f2f;
-  --lightMainColor: #ef5350;
-  --secondColor: #0c54bc;
-  --whiteColor: #ffebee;
+  --mainColor: #202020;
+  --lightMainColor: #23282d;
+  --secondColor: #0099D5;
+  --lightSecondColor: #488a98;
+  --whiteColor: #fafafa;
   --blackColor: #1f1d1d;
 }
 
@@ -31,6 +32,10 @@ code {
 .bg-second-color {
   background-color: var(--secondColor);
 }
+.bg-second-light-color {
+  background-color: var(--lightSecondColor);
+}
+
 
 .bg-white-color {
   background-color: var(--whiteColor);
@@ -43,7 +48,9 @@ code {
 .text-main-color {
   color: var(--mainColor);
 }
-
+.text-main-light-color {
+  color: var(--lightMainColor);
+}
 .text-second-color {
   color: var(--secondColor);
 }
@@ -56,6 +63,9 @@ code {
   color: var(--blackColor);
 }
 
+.table-active {
+  background-color: #fdfbfb;
+}
 /* start components */
 
 /* dashboard item */
@@ -69,6 +79,9 @@ code {
   box-shadow: 1px 1px 6px -1px #888888;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
 /* Box */
 .box {
   height: 200px;

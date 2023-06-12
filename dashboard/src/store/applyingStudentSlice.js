@@ -7,7 +7,6 @@ export const applyingStudentSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getApplyingStudents: builder.query({
             query: (query = {}) => {
-                console.log(query)
                 let newQuery = new StudentQueryParmsBuilder();
 
                 if (query.offset) newQuery.setOffset(query.offset)
@@ -16,13 +15,12 @@ export const applyingStudentSlice = apiSlice.injectEndpoints({
 
                 return ({
                     method: "GET",
-                    url: `students/un-accepted${newQuery.get()}`,
+                    url: `v2/applying-students${newQuery.get()}`,
                     headers: {
                         'authorization': getToken()
                     },
                 })
-            },
-            providesTags: ["Student"]
+            }
         }),
         countApplyingStudents: builder.query({
             query: (query = {}) => {
@@ -32,7 +30,7 @@ export const applyingStudentSlice = apiSlice.injectEndpoints({
 
                 return ({
                     method: "GET",
-                    url: `students/un-accepted/count${newQuery.get()}`,
+                    url: `v2/applying-students/count${newQuery.get()}`,
                     headers: {
                         'authorization': getToken()
                     }
@@ -43,26 +41,36 @@ export const applyingStudentSlice = apiSlice.injectEndpoints({
             query: (studentId) => {
                 return ({
                     method: "GET",
-                    url: `students/${studentId}/un-accepted`,
+                    url: `v2/applying-students/${studentId}`,
                     headers: {
                         'authorization': getToken()
                     },
                 })
-            },
-            providesTags: ["Student"]
+            }
         }),
-        createApplyingStudent: builder.mutation({
-            query: ({ studentId, acceptingStudentData}) => {
+        acceptApplyingStudent: builder.mutation({
+            query: ({ studentId, acceptingStudentData }) => {
                 return ({
-                    method: "PUT", 
-                    url: `students/${studentId}/un-accepted`,
+                    method: "PATCH", 
+                    url: `v2/applying-students/${studentId}`,
                     headers: {
-                        'authorization': getToken()
+                        'authorization': getToken(),
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(acceptingStudentData)
                 })
-            }, 
-            invalidatesTags: ["Student"]
+            }
+        }),
+        refuseApplyingStudent: builder.mutation({
+            query: (studentId) => {
+                return {
+                    method: "DELETE", 
+                    url: `v2/applying-students/${studentId}`,
+                    headers: {
+                        'authorization': getToken()
+                    }
+                }
+            }
         })
     })
 })
@@ -70,5 +78,6 @@ export const {
     useGetApplyingStudentQuery, 
     useGetApplyingStudentsQuery, 
     useCountApplyingStudentsQuery,
-    useCreateApplyingStudentMutation
+    useAcceptApplyingStudentMutation,
+    useRefuseApplyingStudentMutation
 } = applyingStudentSlice;

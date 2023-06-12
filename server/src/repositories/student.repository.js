@@ -15,15 +15,14 @@ exports.findStudentById = async (studentId) => await Student.findOne({
 exports.findApplyinStudentById = async (studentId) => await Student.findOne({
     where: { id: studentId, accepted: false },
     attributes: { exclude: ["id", "password", "accepted"] }, 
-    include: { model: Grade, attributes: ["name"]},
-    
+    include: { model: Grade },
 });
 exports.findAll = async (query, offset = 0, limit = 10) => await Student
     .findAll({
         where: query,
         offset,
         limit,
-        attributes: { exclude: ["id", "password", "accepted", "gradeId" ]},
+        attributes: { exclude: ["password", "accepted", "gradeId" ]},
         include: !query.gradeId ? [ { model: Grade, attributes: ["name"]} ] : []
     })
 
@@ -52,7 +51,7 @@ exports.findLoginDataByEmail = async (email) => {
             { model: StudentCourse, attributes: ["courseId"]}
         ]
     });
-    console.log(student)
+    
     if (!student)
         return null;
     return { 

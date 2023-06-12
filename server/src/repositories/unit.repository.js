@@ -1,12 +1,15 @@
-const { Course, Unit, db, Exam, Section } = require("../models");
+const { Course, Unit, db, Section } = require("../models");
 const FactoryRepository = require("./factory/index");
 const { catchErrorOnCreate } = require("./errorHandlers");
 
-exports.findById = FactoryRepository.findById(Unit, { exclude: "courseId" }, {
-    model: Section,
-    sort: [["arrangement", "ASC"]]
-});
-
+exports.findById = async (id) => await Unit.findOne({
+    where: { id },
+    include: {
+        model: Section,
+        attributes: ["id", "name", "type", "arrangement"],
+    },
+    order: [[Section, "arrangement", "ASC"]]
+})
 exports.create = async ({ name, video, description, courseId  }) => {
     let course = await Course.findOne({
         where: {
@@ -51,54 +54,16 @@ exports.create = async ({ name, video, description, courseId  }) => {
 
 exports.updateById = FactoryRepository.updateById(Unit);
 
-exports.deleteById = async unitId => {
-    let unit = await Unit
-        .findOne({ where: { id: unitId }, attributes: ["examId"], raw: true });
-    
-    if (!unit)
-        return false;
-    
-    let deleteUnitResult = await Unit.destroy({
-        where: { id: unitId },
-    });
-    
-    if (!deleteUnitResult)
-        return false;
-
-    await Exam.destroy({ where: { id: unit.examId }});
-    
-    return true
-};
+exports.deleteById = FactoryRepository.deleteById(Unit);
 
 exports.findExamByUnitId = async (unitId) => await (
     await Unit.findOne({ 
         where: { id: unitId },
-        attributes: ["id"],
-        include: [Exam]
+        attributes: ["exam"],
     })
 ).exam;
 
 exports.createExam = async (unitId, examData) => {
-    let transaction = await db.transaction();
-
-    try {
-        let newExam = await Exam.create(examData, { transaction });
-        let updatedUnit = await Unit.update(
-            { examId: newExam.id }, 
-            { 
-                where: { id: unitId },
-                transaction
-            }
-        );
-        
-        if (!updatedUnit[0])
-            throw new Error()
-        
-        await transaction.commit();
-        return newExam;
-    } catch (err) {
-        console.log("error happed in create exam", err)
-        await transaction.rollback();
-        catchErrorOnCreate(err)
-    }
+    let updateUnit = await Unit.update({ exam: examData }, { where: { id: unitId } })
+    return updateUnit[0] ? true : false
 }

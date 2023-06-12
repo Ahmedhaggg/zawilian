@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { getToken, setToken } from "../services/storage";
-
+console.log(process.env.REACT_APP_API_URL)
 export const login = createAsyncThunk(
     "auth/login",
     async (data, thunkApi) => {
@@ -8,7 +8,7 @@ export const login = createAsyncThunk(
 
         try {
             let sendLogin = await fetch(
-                `${process.env.REACT_APP_API_URL}/auth/login`,
+                `${process.env.REACT_APP_API_URL}v2/teacher/auth/login`,
                 {
                     method: 'POST',
                     headers: {
@@ -46,11 +46,13 @@ const slice = createSlice({
             state.isLoading = true;
         },
         [login.fulfilled]: (state, action) => {
+            console.log("action in fullfilld", action)
             state.isLoading = false;
             state.validationErrors = null;
             state.token = action.payload;
         },
         [login.rejected]: (state, action) => {
+            console.log("action in rejected", action)
             state.isLoading = false;
             if (action.payload.errorName === "loginError")
                 state.loginError = action.payload.message;

@@ -15,14 +15,16 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true
       },
       password: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: false
       },
       phoneNumber: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true
       },
       accepted: {
         type: Sequelize.BOOLEAN,
@@ -40,7 +42,7 @@ module.exports = {
           key: 'id',
         },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE',
       },
     });
 

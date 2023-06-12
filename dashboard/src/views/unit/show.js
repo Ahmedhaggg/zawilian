@@ -1,52 +1,46 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, useParams, Link } from "react-router-dom";
-import Box from "../../components/Box";
 import PageLoading from "../../components/PageLoading";
 import SectionHeader from "../../components/SectionHeader";
 import { useGetUnitQuery } from "../../store/unitSlice";
-import CustomTable from "../../components/CustomTable";
+import UnitContentTable from "../../components/unit/UnitContentTable";
 
 export default function Unit() {
     let { courseId, unitId } = useParams();
-
-    let { data, isLoading, isSuccess } = useGetUnitQuery({ courseId, unitId });
-    useEffect(() => console.log(data), [data])
+    let { data, isSuccess, isLoading } = useGetUnitQuery({ courseId, unitId });
     return (
-        isLoading ? <PageLoading />
-            : !isSuccess ? <Navigate to="/404" />
-                : (
-                    <div className="dashboard-section">
-                        <SectionHeader text={data.unit.name} />
-                        {/* <div className="row justify-content-center">
-                            <Box text="units" number={data.unit.numberOfLessons} bgColor="bg-second-color" />
-                            <Box text="revisions" number={data.unit.numberOfRevisions} bgColor="bg-success" />
-                        </div> */}
-                        <div>
-                            <p className="text-second-color fs-3 mt-3">lessons</p>
-                            {
-                                data.unit.lessons.length === 0 ?
-                                    <p className="alert alert-info w-100 mx-auto">no match lessons</p>
-                                    :
-                                    <CustomTable
-                                        redirectPath={"/courses/" + courseId + "/units/" + unitId + "/lessons/"}
-                                        data={data.unit.lessons}
-                                        linkItems={["name"]}
-                                    />
-                            }
-                            <Link to={"/courses/" + courseId + "/units/" + unitId + "/lessons/create"} className="btn bg-second-color text-white">add new lesson to unit</Link>
+        isLoading ? <PageLoading /> :
+            !isSuccess ?
+                <Navigate to="/404" />
+                :
+                <div className="dashboard-section">
+                    <SectionHeader text={data.unit.name + " unit" } />
+                    <div>
+                    <div className="d-flex justify-content-center align-items-center mb-2">
+                        <div className="col-3">
+                            <p className="text-main-light-color fs-4 mt-3 ms-3 text-left">content</p>
                         </div>
-                        <div>
-                            <p className="text-main-color fs-3 mt-3">revisions</p>
-                            {
-                                data.unit.revisions.length === 0 ?
-                                    <p className="alert alert-info w-100 mx-auto">no match revisions</p>
-                                    :
-                                    <CustomTable redirectPath={"/courses/" + courseId + "/units/" + unitId + "/revisions/"} data={data.unit.revisions} linkItems={["name"]} />
-                            }
-                            <Link to={"/courses/" + courseId + "/units/" + unitId + "/revisions/create"} className="btn bg-main-color text-white">add new revision to unit</Link>
-                        </div>
+                        <div className="col-9 d-flex justify-content-end">
+                            <div>
+                                <Link 
+                                    to={`/courses/${courseId}/units/${unitId}/lessons/create`} 
+                                    className="p-2 text-decoration-none rounded bg-second-color text-white"
+                                >new lesson</Link>
+                            </div>
+                            <div className="ml-3">
+                                <Link 
+                                    to={`/courses/${courseId}/units/${unitId}/revisions/create`} 
+                                    className="p-2 text-decoration-none rounded bg-second-light-color text-white"
+                                >new revision</Link>
+                            </div>
+                        </div> 
+                    </div> 
+                        {
+                            data.unit.sections.length ? 
+                                <UnitContentTable data={data.unit.sections} />
+                            : <p className="alert alert-info units or revisions">unit doesn't contains lessons or revisions</p>
+                        }
                     </div>
-
-                )
+                </div>
     );
 }

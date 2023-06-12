@@ -17,9 +17,11 @@ exports.store = async (req, res, next) => {
 }
 
 exports.showStudentsScoresInExam = async (req, res, next) => {
-    let { examId } = req.params;
+    let { unitId = null, sectionId = null, courseRevisionId = null } = req.query;
 
-    let studentsScore = await examScoreRepository.findStudentsScoreByExamId(examId);
+    let studentsScore = await examScoreRepository.findStudentsScoresInExam({
+        unitId, sectionId, courseRevisionId
+    });
     
     res.status(status.OK).json({
         success: true,

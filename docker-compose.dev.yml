@@ -10,14 +10,14 @@ services:
       - ./server/test:/zawilian/server/test:ro
       - ./server/images:/zawilian/server/images
     command: npm run start:dev
-  # dashboard:
-  #   build: 
-  #     context: "./dashboard/"
-  #     args:
-  #       - NODE_ENV=development
-  #   volumes:
-  #     - ./dashboard/src:/zawilian/dashboard/src:ro
-  #     - /zawilian/dashboard/node_modules
-  #   command: npm run start
+  dashboard:
+    build: 
+      context: "./dashboard/"
+      args:
+        - NODE_ENV=development
+    volumes:
+      - ./dashboard/src:/zawilian/dashboard/src:ro
+      - /zawilian/dashboard/node_modules
+    command: npm run start
 volumes:
   images: 

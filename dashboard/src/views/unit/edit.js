@@ -10,9 +10,6 @@ export default function EditUnit() {
     let getUnit = useGetUnitQuery({ courseId, unitId });
     let [redirect, setRedirect] = useState(false);
     let [UpdateUnit, UpdateUnitResult] = useUpdateUnitMutation();
-
-    useEffect(() => console.log(UpdateUnitResult), [UpdateUnitResult]);
-
     const {
         register,
         handleSubmit,
@@ -51,10 +48,19 @@ export default function EditUnit() {
                                         {...register("name", { required: true })}
                                         defaultValue={getUnit.data.unit.name}
                                     />
-
                                     {
                                         UpdateUnitResult.error?.data?.error?.errors?.name ?
                                             <div className="alert alert-danger">{UpdateUnitResult.error.data.error.errors.name}</div> : null
+                                    }
+
+                                    <textarea className={`form-control form-control-lg mb-3 ${errors.name ? 'border-danger' : ''}`}
+                                        placeholder="description" aria-label="description"
+                                        {...register("description", { required: true })}
+                                        defaultValue={getUnit.data.unit.description}
+                                    ></textarea>
+                                    {
+                                        UpdateUnitResult.error?.data?.error?.errors?.description ?
+                                            <div className="alert alert-danger">{UpdateUnitResult.error.data.error.errors.description}</div> : null
                                     }
 
                                     <div className="text-center">
@@ -66,7 +72,7 @@ export default function EditUnit() {
                                                 <p className="alert alert-success">{UpdateUnitResult.data.message}</p>
                                                 : null
                                         }
-                                        <button type="submit" className="btn btn-primary btn-lg">update course</button>
+                                        <button type="submit" className="btn btn-primary btn-lg">update unit</button>
                                     </div>
                                 </form>
                             </div>

@@ -14,11 +14,10 @@ export default function EditLesson() {
     let { register, handleSubmit, formState: { errors } } = useForm();
 
     let submitHandler = (newLessonData) => {
-        updateLesson({ unitId, lessonId, newLessonData })
+        updateLesson({ courseId, unitId, lessonId, newLessonData })
     }
 
     useEffect(() => {
-        console.log(updateLessonResult)
         let timeout;
         if (updateLessonResult.isSuccess) {
             timeout = setTimeout(() => { setRedirect(true) }, 2000);
@@ -82,7 +81,7 @@ export default function EditLesson() {
                                 </form>
                             </div>
                         </div>
-                        {redirect && <Navigate to={`/courses/${courseId}/units/${unitId}/lessons/${lessonId}`} />}
+                        {redirect && <Navigate to={`/courses/${courseId}/units/${unitId}`} />}
                     </div>
                 )
     );

@@ -34,15 +34,18 @@ services:
       - ./server/.env
     restart: unless-stopped
 
-  # dashboard:
-  #   container_name: dashboard
-  #   build: 
-  #     context: "./dashboard/"
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - server
-  #   env_file:
-  #     - ./.env
+  dashboard:
+    container_name: dashboard
+    build: 
+      context: "./dashboard/"
+      dockerfile: Dockerfile
+    depends_on:
+      - server
+    env_file:
+      - ./dashboard/.env
+    expose: 
+      - 3000
+    
 
   adminer:
     image: adminer

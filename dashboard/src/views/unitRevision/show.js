@@ -1,47 +1,41 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import PageLoading from "../../components/PageLoading";
-import { useGetUnitRevisionQuery } from "../../store/unitRevisionSlice";
+import { useGetUnitRevisionQuery, useGetUnitRevisionExamQuery } from "../../store/unitRevisionSlice";
 import { Navigate, useParams } from "react-router-dom"
 import SectionHeader from "../../components/SectionHeader";
 import ExamPreview from "../../components/exam/ExamPreview";
-
 export default function UnitRevision() {
     let { unitId, revisionId } = useParams();
     let { data, isSuccess, isLoading } = useGetUnitRevisionQuery({ unitId, revisionId })
-    useEffect(() => console.log(data), [data])
-
+    let [showExam, setShowExam] = useState(false)
+    let { data: exam, isSuccess : examIsLoadingSuccess } = useGetUnitRevisionExamQuery({ unitId, revisionId }, { skip: showExam ? false : true });
+    
     return (
         isLoading ? <PageLoading />
             : !isSuccess ? <Navigate to="/404" />
                 : (
                     <div className="dashboard-section px-4">
-                        <SectionHeader text="revision" />
-                        <div className="row align-items-center">
-                            <div className="col-12 col-xl-6 mb-5 text-start">
-                                <ul className="list-group">
-                                    <li className="list-group-item">
-                                        <div className="row py-2 ">
-                                            <div className="col-3">name</div>
-                                            <div className="col-9 text-center">{data.revision.name}</div>
-                                        </div>
-                                    </li>
-                                    <li className="list-group-item">
-                                        <div className="row py-2">
-                                            <div className="col-3">arrangement</div>
-                                            <div className="col-9 text-center">{data.revision.arrangement}</div>
-                                        </div>
-                                    </li>
-                                    <li className="list-group-item">
-                                        <div className="row py-2 align-items-center">
-                                            <div className="col-3">description</div>
-                                            <div className="col-9 text-center">{data.revision.description} and we what is organic chemstry and number of lessons and who to study lessons</div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="col-12 col-xl-6 mb-5">
+                        <SectionHeader text="unit revision" />
+                        <div>
+                            <ul className="list-group">
+                                <li className="list-group-item text-second-color">
+                                    <div className="row py-2 ">
+                                        <div className="col-3">name</div>
+                                        <div className="col-9 text-center">{data.revision.name}</div>
+                                    </div>
+                                </li>
+                                <li className="list-group-item">
+                                    <div className="row py-2 align-items-center">
+                                        <div className="col-3">description</div>
+                                        <div className="col-9 text-center">{data.revision.description}</div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <div className="mt-4">
+                                <p className="h4 mb-3 text-main-light-color">revision video</p>
                                 <iframe
-                                    src="https://www.youtube.com/embed/E7wJTI-1dvQ"
+                                    src={data.revision.video}
                                     allow="autoplay; encrypted-media"
                                     allowFullScreen
                                     title="video"
@@ -49,10 +43,22 @@ export default function UnitRevision() {
                                 />
                             </div>
                         </div>
-                        <div className="mb-5">
-                            <p className="text-primary fs-3 mb-4">Exam</p>
-                            <ExamPreview exam={data.revision.exam} />
-                        </div>
+                        {
+                            !showExam &&
+                            <div className="mt-5">
+                                <button 
+                                    className="btn btn-primary"
+                                    onClick={() => setShowExam(true)}
+                                >show the Exam</button>
+                            </div>
+                        }
+                        {
+                            examIsLoadingSuccess && 
+                                <div className="mb-5">
+                                    <p className="text-primary h5 my-4">Exam</p>
+                                    <ExamPreview exam={exam.exam} />
+                                </div>
+                        }
                     </div>
                 )
     );

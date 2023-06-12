@@ -1,4 +1,4 @@
-const { Unit, Exam, Section, db } = require("../models");
+const { Unit, Section, db } = require("../models");
 const FactoryRepository = require("./factory/index");
 const { catchErrorOnCreate } = require("./errorHandlers");
 
@@ -6,9 +6,9 @@ exports.findById = async (id) => Section
     .findOne({ 
         where: { id, type: "revision" }, 
         attributes: {
-            exclude: ["type", "examId"] 
+            exclude: ["type", "exam"] 
         }
-    })
+    });
     
 exports.create = async ({ name, video, exam, description, unitId }) => {
     let unit = await Unit.findOne({
@@ -25,15 +25,14 @@ exports.create = async ({ name, video, exam, description, unitId }) => {
     let transaction = await db.transaction();
     
     try {
-        let newExam = await Exam.create(exam, { transaction });
 
         let newRevision = await Section.create({
             unitId,
             name, 
             video,
             description,
-            examId: newExam.id,
             type: "revision",
+            exam,
             arrangement: unit.lastSectionArrangement + 1
         }, { transaction });
 
@@ -49,7 +48,7 @@ exports.create = async ({ name, video, exam, description, unitId }) => {
         
         await transaction.commit();
 
-        return { ...newRevision.dataValues, exam: newExam };
+        return { ...newRevision.dataValues };
 
     } catch (err) {
         await transaction.rollback();
@@ -59,29 +58,11 @@ exports.create = async ({ name, video, exam, description, unitId }) => {
 
 exports.updateById = FactoryRepository.updateById(Section);
 
-exports.deleteById = async unitRevisionId => {
-    let unitRevision = await Section
-        .findOne({ where: { id: unitRevisionId, type: "revision" }, attributes: ["examId"], raw: true });
-    
-    if (!unitRevision)
-        return false;
-    
-    let deleteUnitRevisionResult = await Section.destroy({
-        where: { id: unitRevisionId }
-    });
-    
-    if (!deleteUnitRevisionResult)
-        return false;
-
-    await Exam.destroy({ where: { id: unitRevision.examId }});
-    
-    return true
-};
+exports.deleteById = FactoryRepository.deleteById(Section)
 
 exports.findExamByRevisionId = async (revisionId) => await (
-        await Section.findOne({ 
-            where: { id: revisionId , type: "revision" },
-            attributes: ["id"],
-            include: [Exam]
-        })
-    ).exam;
+    await Section.findOne({ 
+        where: { id: revisionId  },
+        attributes: ["exam"],
+    })
+).exam;

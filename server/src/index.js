@@ -25,6 +25,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+    console.log(err)
     res.status(err.httpStatusCode || 500).json({
         success: false,
         error: err.description || messages.serverError

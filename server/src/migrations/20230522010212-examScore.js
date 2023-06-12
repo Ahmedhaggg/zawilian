@@ -3,6 +3,11 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('ExamScore', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       courseRevisionId: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -23,7 +28,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
-      unitRevisionId: {
+      sectionId: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
@@ -32,27 +37,6 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
-      },
-      lessonId: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model: 'Section',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-      },
-      examId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        references: {
-          model: 'Exam',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       score: {
         type: Sequelize.INTEGER(3),
@@ -63,6 +47,14 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
+      studentId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: "Student",
+          key: "id"
+        },
+      }
     });
   },
 

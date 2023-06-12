@@ -15,7 +15,7 @@ export const studentSlice = apiSlice.injectEndpoints({
 
                 return ({
                     method: "GET",
-                    url: `students${newQuery.get()}`,
+                    url: `v2/students${newQuery.get()}`,
                     headers: {
                         'authorization': getToken()
                     },
@@ -31,7 +31,7 @@ export const studentSlice = apiSlice.injectEndpoints({
 
                 return ({
                     method: "GET",
-                    url: `students/count${newQuery.get()}`,
+                    url: `v2/students/count${newQuery.get()}`,
                     headers: {
                         'authorization': getToken()
                     }
@@ -42,7 +42,7 @@ export const studentSlice = apiSlice.injectEndpoints({
             query: (studentId) => {
                 return ({
                     method: "GET",
-                    url: `students/${studentId}`,
+                    url: `v2/students/${studentId}`,
                     headers: {
                         'authorization': getToken()
                     },
@@ -50,6 +50,22 @@ export const studentSlice = apiSlice.injectEndpoints({
             },
             providesTags: ["Student"]
         }),
+        getStudentExamsScores: builder.query({
+            query: (studentId) => {
+                return ({
+                    method: "GET",
+                    url: `v2/exams-scores/students/${studentId}`,
+                    headers: {
+                        'authorization': getToken()
+                    }
+                })
+            }
+        })
     })
 })
-export const { useGetStudentQuery, useGetStudentsQuery, useCountStudentsQuery } = studentSlice
+export const { 
+    useGetStudentQuery, 
+    useGetStudentsQuery, 
+    useCountStudentsQuery,
+    useGetStudentExamsScoresQuery
+} = studentSlice

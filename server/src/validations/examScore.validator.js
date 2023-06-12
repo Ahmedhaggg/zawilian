@@ -8,8 +8,6 @@ module.exports = {
                 return [
                     check("score").notEmpty().withMessage(messages.genrale.required)
                         .isInt().withMessage(messages.genrale.isNumber),
-                    check("examId").notEmpty().withMessage(messages.genrale.required)
-                        .isInt().withMessage(messages.genrale.isNumber),
                     check("relatedId")
                         .custom((_, { req }) => {
                             const fields = ['courseRevisionId', 'sectionId', 'unitId'];

@@ -1,4 +1,4 @@
-const { Course, Grade, CourseRevision, Section, Unit, Student, ExamScore, db, Exam } = require("../../src/models");
+const { Course, Grade, CourseRevision, Section, Unit, Student, ExamScore, db } = require("../../src/models");
 const exmScoreRepository = require("../../src/repositories/examScore.repository"); // Replace with the actual repository file
 const { cleanDatabase } = require("../testHelper");
 
@@ -8,10 +8,6 @@ describe("exam score Repository Integration Tests", () => {
     let courseRevisionId;
     let lessonId;
     let unitRevisionId;
-    let unitExamId;
-    let courseRevisionExamId;
-    let unitRevisionExamId;
-    let lessonExamId;
     let courseId;
 
     let examData = {
@@ -31,8 +27,9 @@ describe("exam score Repository Integration Tests", () => {
     }
 
     beforeAll(async () => {    
+        try {
         await db.authenticate();
-        const newGrade = Grade.create({ name: "grade 1" });
+        const newGrade = await Grade.create({ name: "grade 1" });
 
         const studentData = {
             name: "John Doe",
@@ -42,49 +39,45 @@ describe("exam score Repository Integration Tests", () => {
             password: "password",
             phoneNumber: "1234567890"
         };
-
+        
         const newStudent = await Student.create(studentData);
         studentId = newStudent.id;
+        
 
         const newCourse = await Course.create({ name: "course 1", term: "first", gradeId: newGrade.id  });
         courseId = newCourse.id;
-        let newUnitExam = await Exam.create(examData);
-        unitExamId = newUnitExam.id;
         
         // Insert test data for unit
         const newUnit = await Unit.create({
             name: "revision 1",
             description: "description",
             courseId: newCourse.id,
-            examId: newUnitExam.id,
+            exam: examData,
             courseId: newCourse.id,
             arrangement: 1
         });
         unitId = newUnit.id;
     
         // Insert test data for course revision
-        let newCourseRevisionExam = await Exam.create(examData);
-        courseRevisionExamId = newCourseRevisionExam.id
         const newCourseRevision = await CourseRevision.create({
             name: "revision 1",
             video: "http://youtube.com/watch/1",
             description: "description",
             courseId: newCourse.id,
-            examId: newCourseRevisionExam.id,
+            exam: examData,
             courseId: newCourse.id,
             arrangement: 1
         });
         courseRevisionId = newCourseRevision.id;
-    
-        // Insert test data for unit revision
-        let newUnitRevisionExam = await Exam.create(examData);
-        unitRevisionExamId = newUnitRevisionExam.id;
+
+
+        // Insert test data for course unit revision
         const newUnitRevision = await Section.create({
             name: "revision 1",
             video: "http://youtube.com/watch/1",
             description: "description",
             courseId: newCourse.id,
-            examId: newUnitRevisionExam.id,
+            exam: examData,
             type: "revision",
             unitId,
             arrangement: 3
@@ -92,20 +85,21 @@ describe("exam score Repository Integration Tests", () => {
         unitRevisionId = newUnitRevision.id;
 
         // Insert test data for lesson
-        let newLessonExam = await Exam.create(examData);
-        lessonExamId = newLessonExam.id;
         const newLesson = await Section.create({
             name: "revision 1",
             video: "http://youtube.com/watch/1",
             description: "description",
             courseId: newCourse.id,
-            examId: newLessonExam.id,
+            exam: examData,
             type: "lesson",
             unitId,
             arrangement: 1
         });
         examData.id = newLessonExam.id;
         lessonId = newLesson.id;
+        } catch (error) { 
+            console.log(error)
+        }
     });
 
     afterAll(async () => {
@@ -114,32 +108,28 @@ describe("exam score Repository Integration Tests", () => {
 
     describe("create", () => {
         it("should save student unit exam score and return object", async () => {
-            let newExamScore = await exmScoreRepository.create({ studentId, examId: unitExamId, unitId, score: 10 })
-            expect(newExamScore).toHaveProperty("examId")
+            let newExamScore = await exmScoreRepository.create({ studentId, unitId, score: 10 })
             expect(newExamScore).toHaveProperty("studentId")
             expect(newExamScore).toHaveProperty("score")
             expect(newExamScore).toHaveProperty("unitId")
         }); 
 
         it("should save student course revision exam score and return object", async () => {
-            let newExamScore = await exmScoreRepository.create({ studentId, examId: courseRevisionExamId, courseRevisionId, score:20 })
-            expect(newExamScore).toHaveProperty("examId")
+            let newExamScore = await exmScoreRepository.create({ studentId, courseRevisionId, score:20 })
             expect(newExamScore).toHaveProperty("studentId")
             expect(newExamScore).toHaveProperty("score")
             expect(newExamScore).toHaveProperty("courseRevisionId")
         });
 
         it("should save student lesson exam score and return object", async () => {
-            let newExamScore = await exmScoreRepository.create({ studentId, examId: lessonExamId, sectionId: lessonId, score: 15 })
-            expect(newExamScore).toHaveProperty("examId")
+            let newExamScore = await exmScoreRepository.create({ studentId, sectionId: lessonId, score: 15 })
             expect(newExamScore).toHaveProperty("studentId")
             expect(newExamScore).toHaveProperty("score")
             expect(newExamScore).toHaveProperty("sectionId")
         });
 
         it("should save student unit revision exam score and return object", async () => {
-            let newExamScore = await exmScoreRepository.create({ studentId, examId: unitRevisionExamId, sectionId: unitRevisionId , score: 12 })
-            expect(newExamScore).toHaveProperty("examId")
+            let newExamScore = await exmScoreRepository.create({ studentId, sectionId: unitRevisionId , score: 12 })
             expect(newExamScore).toHaveProperty("studentId")
             expect(newExamScore).toHaveProperty("score")
             expect(newExamScore).toHaveProperty("sectionId")
@@ -148,7 +138,7 @@ describe("exam score Repository Integration Tests", () => {
 
     describe("findStudentsScoreByExamId", () => {
         it("should return array contains score and student", async () => {
-            let result = await exmScoreRepository.findStudentsScoreByExamId(unitExamId);
+            let result = await exmScoreRepository.findStudentsScoresInExam({ unitId });
             console.log("this is result of find specific exam students socre", result)
 
             expect(Array.isArray(result)).toBe(true)
@@ -163,14 +153,13 @@ describe("exam score Repository Integration Tests", () => {
     describe("findStudentCourseExamsScore", () => {
         it("should return students' exams scores to units and revisions arranged in succession", async () => {
             delete examData.id;
-            let newUnitsExam = await Exam.bulkCreate([examData, examData, examData, examData, examData]);
-            let newUnitsData = newUnitsExam.map((unitExam, index) => {
+            let newUnitsData = [...Array(6)].map(x => 0).map((_, index) => {
                 return {
                     name: "unit " + index + 2,
                     description: "description",
                     courseId: courseId,
-                    examId: unitExam.id,
-                    arrangement: index + 2
+                    arrangement: index + 2,
+                    exam: examData
                 }
             })
         
@@ -178,7 +167,6 @@ describe("exam score Repository Integration Tests", () => {
             let newUnits = await Unit.bulkCreate(newUnitsData);
             let newUnitsScoreData =  newUnits.map((newUnit, index) => {
                 return {
-                    examId: newUnit.examId,
                     studentId,
                     unitId: newUnit.id,
                     score: 5 + index 
@@ -190,8 +178,8 @@ describe("exam score Repository Integration Tests", () => {
             expect(Array.isArray(studentCourseScores)).toBe(true)
 
             let originalSortedCourse = studentCourseScores.map(res => { return { 
-                id: res.unit ? res.unit.dataValues.id : res.courseRevision.dataValues.id,
-                arrangement: res.unit ? res.unit.dataValues.arrangement : res.courseRevision.dataValues.arrangement,
+                id: res.unit ? res.unit.id : res.courseRevision.id,
+                arrangement: res.unit ? res.unit.arrangement : res.courseRevision.arrangement,
                 type: res.unit ? "unit" : "courseRevision"
             }})
 
