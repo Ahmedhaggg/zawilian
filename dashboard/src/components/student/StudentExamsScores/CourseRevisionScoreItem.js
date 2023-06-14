@@ -4,7 +4,7 @@ export default function CourseRevisionScoreItem({ data }) {
     return (
         <div className="card">
             <div className="card-header">
-                <div className='d-flex justify-content-between'>
+                <div className='d-flex justify-content-between px-2'>
                     <span>  
                         {data.courseRevision.name}
                     </span>

@@ -9,7 +9,7 @@ export default function Dashboard() {
             <DashboardItem link="/grades" text="grades" iconClass="fa-solid fa-graduation-cap" />
             <DashboardItem link="/courses" text="courses" iconClass="fa-solid fa-microphone-lines" />
             <DashboardItem link="/students" text="students" iconClass="fa-solid fa-user-check" />
-            <DashboardItem link="/non-accepted/students" text="applying students" iconClass="fa-solid fa-user-clock" />
+            <DashboardItem link="/applying-students" text="applying students" iconClass="fa-solid fa-user-clock" />
         </div>
     </div>;
 }

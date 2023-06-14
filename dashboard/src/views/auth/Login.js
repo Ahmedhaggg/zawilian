@@ -23,7 +23,7 @@ export default function Login() {
             <div className="container">
                 <div className="row">
                     <div className="col-12 col-md-6 offset-md-3">
-                        <p className="fs-1 text-main-color text-center">login</p>
+                        <p className="h2 text-main-color text-center">login</p>
                         <form onSubmit={handleSubmit(submitHandler)}>
                             <input className={`form-control form-control-lg mb-3 ${errors.email ? 'border-danger' : ''}`} type="email" name="email"
                                 placeholder="email" aria-label="email"

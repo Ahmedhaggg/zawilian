@@ -1,7 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import Logout from './Logout'
 
 export default function Navbar() {
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light d-md-none d-block py-3">
             <div className="container-fluid">
@@ -22,6 +24,9 @@ export default function Navbar() {
                         </li>
                         <li className="nav-item">
                             <Link className='nav-link' to="/applying-students">applying students</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Logout color="black"/>
                         </li>
                     </ul>
                 </div>

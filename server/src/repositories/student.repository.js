@@ -46,7 +46,7 @@ exports.findLoginDataByEmail = async (email) => {
         where: {
             email
         },
-        attributes: ["accepted", "email", "password"],
+        attributes: ["id", "accepted", "email", "password"],
         include: [
             { model: StudentCourse, attributes: ["courseId"]}
         ]
@@ -55,6 +55,7 @@ exports.findLoginDataByEmail = async (email) => {
     if (!student)
         return null;
     return { 
+        id: student.id,
         accepted: student.accepted,
         email: student.email,
         password: student.password,

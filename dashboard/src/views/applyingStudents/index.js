@@ -77,7 +77,7 @@ export default function ApplyingStudents() {
                     </div>
                     {
                             data.applyingStudents.length === 0 ? 
-                                <p className="alert alert-info pt-3 w-100">no students in this grade</p>
+                                <p className="alert alert-info pt-3 w-100">no applying students in this grade</p>
                             : null
                     }
                     <Pagination numberOfPages={totalOfPages} 

@@ -14,7 +14,7 @@ exports.guard = (...roles) => catchErrors(async (req, res, next) => {
 
 
         let tokenData = await jwt.getDataFromJwtToken(token);
-        
+        console.log(tokenData)
         if (!roles.includes(tokenData.role)) 
             throw new APIError(status.UNAUTHORIZED, {
                 message: messages.unauthorized

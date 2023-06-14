@@ -49,7 +49,7 @@ exports.login = async (req, res, next) => {
 
     let token = await jwt.createJwtToken({
         id: student.id,
-        role: roles.STUDENT,
+        role: "student",
         courseId: student.courseId
     }, "30d");
 
