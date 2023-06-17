@@ -26,11 +26,8 @@ export default function AcceptStudentForm({ courseId }) {
   let [acceptApplyingStudent, acceptApplyingStudentResult] = useAcceptApplyingStudentMutation() 
   
   const submitHandler = (values) => {
-    console.log("values111111", values)
-
     let selectedSectionArrangement = values.startSectionId ? selectedUnitData.unit.sections
-      .find(section => section.id ===  values.startSectionId).arrangement : 1
-      console.log("values", values)
+      .find(section => section.id ===  parseInt(values.startSectionId)).arrangement : 1
 
     acceptApplyingStudent({ 
       studentId: id, 
@@ -40,7 +37,7 @@ export default function AcceptStudentForm({ courseId }) {
       }
     })
   }
-  console.log("accepting result", acceptApplyingStudentResult)
+
   return (
     courseIsSuccessLoading ? 
       <div>

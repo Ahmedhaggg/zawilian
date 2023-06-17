@@ -51,7 +51,7 @@ exports.findLoginDataByEmail = async (email) => {
             { model: StudentCourse, attributes: ["courseId"]}
         ]
     });
-    
+
     if (!student)
         return null;
     return { 
@@ -59,7 +59,7 @@ exports.findLoginDataByEmail = async (email) => {
         accepted: student.accepted,
         email: student.email,
         password: student.password,
-        courseId: student.courseId
+        courseId: student.studentCourse.courseId
     }
 }
 
