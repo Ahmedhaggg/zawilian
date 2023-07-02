@@ -36,7 +36,7 @@ const ExamSocre = db.define("examScore", {
     },
     score: {
         type: DataTypes.TINYINT,
-        allowNull: false
+        allowNull: true
     },
     createdAt:{
         type: DataTypes.DATE,

@@ -1,9 +1,15 @@
+const { db } = require("../config/database")
 const { ExamScore, Student, Section, CourseRevision, Unit } = require("../models");
 const FactoryRepository = require("./factory/index");
-const { Op } = require("sequelize");
+const { Op, QueryTypes } = require("sequelize");
 const { transformExamsScores } = require("./helpers/transformExamsScores");
 
 exports.create = FactoryRepository.create(ExamScore);
+
+exports.updateStudentUnitScore = async ({ studentId, unitId, score }) => {
+    let updateResult = await ExamScore.update({ score }, { where: { studentId, unitId } });
+    return updateResult[0] ? true : false
+}
 
 exports.findStudentsScoresInExam = async (query) => await ExamScore 
     .findAll({
@@ -61,3 +67,7 @@ exports.findStudentCourseExamsScore = async studentId => {
         
     return transformExamsScores(examsScores)
 }
+
+// to check if unit is added with null score to examScore beacause getStudentCourseExamsScore depends on unit in examscore to find student lesson exam score
+exports.checkStudentUnitExamScore = async (unitId, studentId) => 
+    await ExamScore.findOne({ where: { unitId, studentId }, attributes: ["id", "score", "unitId"]});

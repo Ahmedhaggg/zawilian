@@ -52,12 +52,8 @@ const slice = createSlice({
             state.token = action.payload;
         },
         [login.rejected]: (state, action) => {
-            console.log("action in rejected", action)
             state.isLoading = false;
-            if (action.payload.errorName === "loginError")
-                state.loginError = action.payload.message;
-            if (action.payload.errorName === "validationError")
-                state.validationErrors = action.payload.validationErrors;
+            state.loginError = "invalid email or password";
         }
 
     }

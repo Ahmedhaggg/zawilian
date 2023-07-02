@@ -13,7 +13,7 @@ module.exports = {
                             const fields = ['courseRevisionId', 'sectionId', 'unitId'];
                             const providedFields = fields.filter((field) => req.body[field]);
 
-                            if (providedFields.length !== 1) 
+                            if (!providedFields || providedFields.length > 2) 
                                 throw new Error(messages.genrale.isRequiredRelatedId)
                             return true;
                         })

@@ -49,9 +49,8 @@ describe("exam score Repository Integration Tests", () => {
         
         // Insert test data for unit
         const newUnit = await Unit.create({
-            name: "revision 1",
+            name: "unit 1",
             description: "description",
-            courseId: newCourse.id,
             exam: examData,
             courseId: newCourse.id,
             arrangement: 1
@@ -63,7 +62,6 @@ describe("exam score Repository Integration Tests", () => {
             name: "revision 1",
             video: "http://youtube.com/watch/1",
             description: "description",
-            courseId: newCourse.id,
             exam: examData,
             courseId: newCourse.id,
             arrangement: 1
@@ -176,7 +174,7 @@ describe("exam score Repository Integration Tests", () => {
 
             let studentCourseScores = await exmScoreRepository.findStudentCourseExamsScore(studentId);
             expect(Array.isArray(studentCourseScores)).toBe(true)
-
+            console.log(studentCourseScores)
             let originalSortedCourse = studentCourseScores.map(res => { return { 
                 id: res.unit ? res.unit.id : res.courseRevision.id,
                 arrangement: res.unit ? res.unit.arrangement : res.courseRevision.arrangement,
@@ -187,4 +185,50 @@ describe("exam score Repository Integration Tests", () => {
             expect(checkSortedCourse).toEqual(originalSortedCourse)
         });
     });
+
+    describe("checkStudentUnitExamScore", () => {
+        it("should return object from examScore which score = 0 and all values null except unitId", async () => {
+            let newUnit = await Unit.create({ 
+                name: "unit 1",
+                description: "description",
+                exam: examData,
+                courseId: courseId,
+                arrangement: 20
+            })
+            
+            await ExamScore.create({
+                studentId,
+                unitId: newUnit.id,
+                score: 0
+            });
+
+            let result = await exmScoreRepository.checkStudentUnitExamScore(newUnit.id, studentId);
+            
+            expect(result.score).toEqual(0)
+            expect(result).toHaveProperty("unitId");
+        });
+    });
+    describe("updateStudentUnitScore", () => {
+        it("should return true", async () => {
+            let newUnit = await Unit.create({ 
+                name: "unit 1",
+                description: "description",
+                exam: examData,
+                courseId: courseId,
+                arrangement: 21
+            })
+            
+            await ExamScore.create({
+                studentId,
+                unitId: newUnit.id,
+                score: 2
+            });
+
+            let result = await exmScoreRepository.updateStudentUnitScore({ unitId: newUnit.id, score: 10, studentId});
+            
+            expect(result).toBe(true)
+            let studentUnitExamScore = await ExamScore.findOne({ where: { unitId: newUnit.id, studentId } })
+            expect(studentUnitExamScore.score).toBe(10)
+        });
+    })
 });

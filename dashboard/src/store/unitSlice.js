@@ -34,7 +34,7 @@ export const unitSlice = apiSlice.injectEndpoints({
                     dispatch(
                         apiSlice.util.updateQueryData('getCourse', courseId, (draft) => {
                             draft.course.units.push({
-                                id: data.newUnit,
+                                id: data.newUnit.id,
                                 name: data.newUnit.name,
                                 arrangement: data.newUnit.arrangement
                             })
@@ -150,6 +150,27 @@ export const unitSlice = apiSlice.injectEndpoints({
                     body: JSON.stringify(newExamData)
                 })
             },
+            async onQueryStarted({ courseId, unitId, newExamData}, { dispatch, queryFulfilled }) {
+                try {
+                    let { data } = await queryFulfilled;
+                    if (!data.success)
+                        return;
+
+                    dispatch(
+                        apiSlice.util.updateQueryData('getUnit', { courseId, unitId }, (draft) => {
+                            Object.assign(draft, {
+                                ...draft,
+                                unit: {
+                                    ...draft.unit,
+                                    exam: newExamData
+                                },
+                            })
+                        })
+                    )
+                } catch (e) {
+                    console.log(e)
+                }
+            }
         }),
         getUnitExam: builder.query({
             query: ({ courseId , unitId }) => {

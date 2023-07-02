@@ -1,5 +1,5 @@
 const { 
-    Section, Unit, ExamScore, CourseRevision, Grade, Course, StudentCourse, Student, Exam 
+    Section, Unit, ExamScore, CourseRevision, Grade, Course, StudentCourse, Student 
 } = require("../src/models")
 
 exports.cleanDatabase = async () => {
@@ -8,7 +8,6 @@ exports.cleanDatabase = async () => {
         Section.destroy({ where: {} }),
         Unit.destroy({ where: {} }),
         CourseRevision.destroy({ where: {} }),
-        Exam.destroy({ where: {} }),
         Course.destroy({ where: {} }),
         Grade.destroy({ where: {} }),
         StudentCourse.destroy({ where: {} }),

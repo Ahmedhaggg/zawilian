@@ -7,7 +7,7 @@ import { login } from "../../store/authSlice"
 export default function Login() {
     let dispatch = useDispatch();
     let { token, loginError } = useSelector(state => state.auth);
-
+    console.log(loginError)
     const {
         register,
         handleSubmit,

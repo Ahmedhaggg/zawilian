@@ -4,6 +4,8 @@ const { db, Grade, Course, CourseRevision, Unit, Section, Student, Exam } = requ
 const testData  = require('../testData');
 const { createJwtToken } = require('../../src/helpers/jwt');
 const { cleanDatabase } = require('../testHelper');
+let unitRepository = require("../../src/repositories/examScore.repository");
+
 describe('course endpoints', () => {
     let teacherToken;
     let studentToken;
@@ -64,24 +66,12 @@ describe('course endpoints', () => {
     });
 
     describe('POST /api/v2/exams-scores', () => {
-        test('should save student score in unit exam', async () => {
-            const { status, body } = await request(app)
-                .post(`/api/v2/exams-scores`)
-                .send({
-                    unitId: unitId,
-                    score: 9
-                })
-                .set("authorization", studentToken);
-
-            expect(status).toBe(200);
-            expect(body.success).toBe(true);
-        });
-
         test('should save student score in lesson exam', async () => {
             const { status, body } = await request(app)
                 .post(`/api/v2/exams-scores`)
                 .send({
                     sectionId: lessonId,
+                    unitId,
                     score: 8
                 })
                 .set("authorization", studentToken);
@@ -95,6 +85,7 @@ describe('course endpoints', () => {
                 .post(`/api/v2/exams-scores`)
                 .send({
                     sectionId: unitRevisionId,
+                    unitId,
                     score: 7
                 })
                 .set("authorization", studentToken);
@@ -115,8 +106,25 @@ describe('course endpoints', () => {
             expect(status).toBe(200);
             expect(body.success).toBe(true);
         });
+
+        test('should save student score in unit exam', async () => {
+            let findStudentUnitExamScore = await unitRepository.findStudentCourseExamsScore(studentId);
+            console.log("before saving unit exam score", findStudentUnitExamScore)
+            const { status, body } = await request(app)
+                .post(`/api/v2/exams-scores`)
+                .send({
+                    unitId,
+                    score: 9
+                })
+                .set("authorization", studentToken);
+
+                let after = await unitRepository.findStudentCourseExamsScore(studentId);
+                console.log("after saving unit exam score", after)
+            expect(status).toBe(200);
+            expect(body.success).toBe(true);
+        });
     });
-    describe('GET /api/v2/exams-score/exams/:examId', () => {
+    describe('GET /api/v2/exams-score/exam', () => {
         test('should return students scores in specific unit', async () => {
             const { status, body } = await request(app)
                 .get(`/api/v2/exams-scores/exam`)
@@ -187,6 +195,4 @@ describe('course endpoints', () => {
             expect(body).toHaveProperty("studentCourseExamScore");
         });
     });
-
-    
 });
