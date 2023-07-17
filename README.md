@@ -45,17 +45,34 @@ To install and set up the project, follow these steps:
    ```shell
    git clone [[https](https://github.com/Ahmedhaggg/zawilian/)]
 2. sure docker and docker-compose are starting
-3. run
+3. create .env file in ./server directory and type variables values
+    ```sh
+   JWT_SECRET= 
+    BCRYPT_SALT= 
+    DB_HOST=
+    SERVER_PORT=
+    DB_PORT=
+    DB_NAME= 
+    DB_PASS=
+    DB_USER=
+    ADMIN_EMAIL=
+    ADMIN_PASSWORD=
+   ```
+4. create .env file in ./dahsboard directory 
+   ```sh
+      REACT_APP_API_URL= "http://localhost/api/"
+   ```
+5. run
 
    ```shell
    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
-4. run database migration
+6. run database migration
 
    ```shell
    docker-compose exec server npm run db:migrate
 
-5. can run test cases
+7. can run test cases
     
     ```shell
     docker-compose exec server npm run test
