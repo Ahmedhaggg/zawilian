@@ -4,7 +4,7 @@
 e learning application for a teacher to explain his courses, follow
 and exam students.
 ## technologies
-### restfull technologies 
+### restfull Api technologies 
 * express.js
 * sequelize
 * postgreSql
@@ -23,13 +23,106 @@ and exam students.
 * accepting students only can show their course.
 * student must pass exam after each unit and lesson and revision.
 
+## Architecture layers
+request =====> guards =====> validation =====> controller =====> repository =====> model
+
+
+## to run the project in your device
+## Prerequisites
+
+Before getting started, ensure that you have the following prerequisites installed:
+
+- [docker]
+- [docker-compose]
+
+
+## Installation
+
+To install and set up the project, follow these steps:
+
+1. Clone the repository:
+
+   ```shell
+   git clone [[https](https://github.com/Ahmedhaggg/zawilian/)]
+2. sure docker and docker-compose are starting
+3. run
+
+   ```shell
+   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+4. run database migration
+
+   ```shell
+   docker-compose exec server npm run db:migrate
+
+5. can run test cases
+    
+    ```shell
+    docker-compose exec server npm run test
 
 ## tables
 ### users
+* id
 * name (quadruple)
 * email
-* phone
+* phoneNumber
 * password
+* accepted
 
+### studentCourse 
+* studentId
+* courseId
+* unitArrangement
+* sectionArrangement
+
+### Grade
+* id
+* name
+* courseId
+
+### Course
+* id
+* name
+* term
+* lastUnitArrangement
+* lastRevisionArrangement
+* gradeId
+
+### Unit
+* id
+* name
+* description
+* arrangement
+* lastSectionArrangement
+* exam
+* courseId
+
+### Section
+* id
+* name
+* description
+* arrangement
+* video
+* exam
+* unitId
+* type ["lesson", "revision"]
+
+### CourseRevision
+* id
+* name
+* description
+* arrangement
+* video
+* exam
+* courseId
+
+### ExamScore
+* id
+* studentId
+* unitId
+* sectionId
+* courseRevisionId
+* score
+* createdAt
 
 
